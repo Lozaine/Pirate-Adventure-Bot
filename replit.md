@@ -8,6 +8,15 @@ This is a comprehensive Discord RPG bot themed around the One Piece anime/manga 
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+### Wiki System Addition (Latest)
+- Added comprehensive `/wiki` command with 8 detailed guide pages
+- Added `/guide` command as an alias to `/wiki`
+- Interactive dropdown navigation between guide sections
+- Complete coverage of all game systems and mechanics
+- Strategic tips and progression guides for all player levels
+
 ## System Architecture
 
 ### Bot Architecture
