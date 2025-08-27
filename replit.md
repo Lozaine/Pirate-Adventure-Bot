@@ -10,13 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### Combat & Shop System Fixes (Latest)
+### Complete Combat System & Database Migration (Latest)
 - Fixed combat system Fight & Flee buttons - now fully functional
-- Added proper button interaction handling for all combat actions
-- Fixed shop browsing with working pagination (Previous/Next buttons)
-- Implemented autocomplete for shop buy command
+- Added proper turn-based combat flow with automatic enemy responses
+- Fixed flee button to work from enemy encounter screen (before combat starts)
+- Implemented PostgreSQL database support for Railway deployment
+- Created hybrid storage system (JSON for Replit, PostgreSQL for Railway)
+- Added database migration scripts and complete schema
 - Removed `/guide` command, keeping only `/wiki` for documentation
-- Improved error handling for Discord interactions
+- All combat sessions now persist through server restarts in production
 
 ## System Architecture
 
@@ -27,10 +29,11 @@ Preferred communication style: Simple, everyday language.
 - **Cooldown Management**: Built-in cooldown system to prevent command spam and maintain game balance
 
 ### Data Storage
-- **File-Based Database**: Custom database system using JSON file storage (`gamedata.json`)
+- **Hybrid Database System**: JSON file storage for Replit, PostgreSQL for Railway deployment
 - **In-Memory Maps**: Uses JavaScript Maps for fast data access during runtime
 - **Auto-Save**: Periodic data persistence every 5 minutes to prevent data loss
-- **Schema Validation**: Structured data schemas for users, crews, and guilds
+- **Schema Validation**: Structured data schemas for users, crews, and combat sessions
+- **Database Migration**: Automatic PostgreSQL setup for production deployment
 
 ### Game Systems
 - **Combat System**: Turn-based combat with health, attack, defense stats and special abilities
@@ -63,8 +66,15 @@ Preferred communication style: Simple, everyday language.
 - **fs/promises**: Asynchronous file operations for database persistence
 - **path**: File path utilities for cross-platform compatibility
 
-### Data Storage
-- **JSON Files**: Local file-based storage for game data persistence
-- **No External Database**: Self-contained data management without external database requirements
+### Data Storage & Production
+- **Development**: JSON file-based storage for game data persistence in Replit environment
+- **Production**: PostgreSQL database with Drizzle ORM for Railway deployment
+- **Migration Scripts**: Automatic database setup and schema creation
+- **Hybrid Storage**: Environment detection switches between local files and PostgreSQL
 
-Note: The application is designed to be easily extensible with PostgreSQL/Drizzle integration if needed for scaling, but currently operates entirely on local file storage for simplicity and portability.
+### Production Dependencies
+- **@neondatabase/serverless**: PostgreSQL driver for serverless environments
+- **drizzle-orm**: TypeScript ORM for database operations
+- **ws**: WebSocket library for database connections
+
+The application now supports both local development with JSON files and production deployment with PostgreSQL, providing scalability and data persistence for Railway hosting.

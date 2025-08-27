@@ -7,11 +7,11 @@
         "username": "aevumwaves",
         "level": 1,
         "experience": 35,
-        "health": 12,
+        "health": 10,
         "maxHealth": 100,
         "attack": 20,
         "defense": 10,
-        "berries": 1060,
+        "berries": 954,
         "devilFruit": null,
         "devilFruitPower": 0,
         "inventory": [],
@@ -27,11 +27,11 @@
           "East Blue"
         ],
         "wins": 1,
-        "losses": 0,
+        "losses": 1,
         "enemiesDefeated": 1,
         "allies": [],
         "treasuresFound": 0,
-        "lastExplore": "2025-08-27T06:57:58.344Z",
+        "lastExplore": "2025-08-27T07:03:10.986Z",
         "lastCombat": null,
         "lastTreasure": null,
         "lastDevilFruit": null,
@@ -42,5 +42,5 @@
   ],
   "crews": [],
   "guilds": [],
-  "lastSaved": "2025-08-27T06:59:41.185Z"
+  "lastSaved": "2025-08-27T07:04:43.027Z"
 }
