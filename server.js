@@ -7,6 +7,11 @@ const PORT = process.env.PORT || 5000;
 // Serve static files (CSS, JS, images)
 app.use(express.static(path.join(__dirname)));
 
+// Favicon support
+app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, 'favicon.png'));
+});
+
 // Serve the main HTML file for all routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
