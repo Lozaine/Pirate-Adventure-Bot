@@ -1,5 +1,5 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const database = require('../database/database.js');
+const database = require('../database/postgresDatabase.js');
 const config = require('../config.js');
 const enemies = require('../data/enemies.js');
 const randomizer = require('../utils/randomizer.js');

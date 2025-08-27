@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const database = require('../database/database.js');
+const database = require('../database/postgresDatabase.js');
 const config = require('../config.js');
 const cooldowns = require('../utils/cooldowns.js');
 const combatSystem = require('../systems/combatSystem.js');

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const database = require('../database/database.js');
+const database = require('../database/postgresDatabase.js');
 const config = require('../config.js');
 const economySystem = require('../systems/economySystem.js');
 const items = require('../data/items.js');

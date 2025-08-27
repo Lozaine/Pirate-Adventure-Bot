@@ -1,4 +1,4 @@
-const database = require('../database/database.js');
+const database = require('../database/postgresDatabase.js');
 const randomizer = require('../utils/randomizer.js');
 
 class CrewSystem {

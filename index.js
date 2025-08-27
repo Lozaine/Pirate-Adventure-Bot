@@ -2,7 +2,7 @@ const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const config = require('./config.js');
-const database = require('./database/database.js');
+const database = require('./database/postgresDatabase.js');
 
 // Create Discord client
 const client = new Client({
