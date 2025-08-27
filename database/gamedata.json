@@ -80,9 +80,50 @@
         ],
         "lastFood": 1756285025854
       }
+    ],
+    [
+      "509753829462376458",
+      {
+        "id": "509753829462376458",
+        "username": "wysavre",
+        "level": 1,
+        "experience": 0,
+        "health": 100,
+        "maxHealth": 100,
+        "attack": 20,
+        "defense": 10,
+        "berries": 1000,
+        "devilFruit": null,
+        "devilFruitPower": 0,
+        "inventory": [],
+        "equipment": {
+          "weapon": null,
+          "armor": null,
+          "accessory": null
+        },
+        "crewId": null,
+        "crewRole": "member",
+        "currentLocation": "East Blue",
+        "locationsVisited": [
+          "East Blue"
+        ],
+        "wins": 0,
+        "losses": 0,
+        "enemiesDefeated": 0,
+        "allies": [],
+        "treasuresFound": 0,
+        "activeFoodBuffs": [],
+        "lastExplore": null,
+        "lastCombat": null,
+        "lastTreasure": null,
+        "lastDevilFruit": null,
+        "lastFood": null,
+        "createdAt": "2025-08-27T09:54:48.485Z",
+        "lastActive": null
+      }
     ]
   ],
   "crews": [],
   "guilds": [],
-  "lastSaved": "2025-08-27T09:44:09.422Z"
+  "lastSaved": "2025-08-27T10:04:09.423Z"
 }
