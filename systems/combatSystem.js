@@ -6,11 +6,12 @@ const randomizer = require('../utils/randomizer.js');
 
 class CombatSystem {
     constructor() {
-        this.activeCombats = new Map(); // userId -> combat session
+        this.activeCombats = new Map(); // userId -> combat session (in-memory fallback)
+        this.useDatabase = process.env.DATABASE_URL ? true : false;
     }
 
     // Start a new combat session
-    startCombat(userId, enemy) {
+    async startCombat(userId, enemy) {
         const user = database.getUser(userId);
         if (!user) return null;
 
@@ -29,12 +30,65 @@ class CombatSystem {
         };
 
         this.activeCombats.set(userId, combatSession);
+
+        // Also save to database if available for Railway deployment
+        if (this.useDatabase) {
+            try {
+                const { storage } = require('../server/storage');
+                await storage.saveCombatSession({
+                    userId: userId,
+                    enemy: enemy,
+                    userHealth: user.health,
+                    userMaxHealth: user.maxHealth,
+                    enemyHealth: enemy.health,
+                    enemyMaxHealth: enemy.health,
+                    turn: 'user',
+                    moves: [],
+                    defendBonus: 0,
+                    status: 'active'
+                });
+            } catch (error) {
+                console.log('[INFO] Using in-memory combat storage (PostgreSQL not available)');
+            }
+        }
+
         return combatSession;
     }
 
     // Get active combat session
-    getActiveCombat(userId) {
-        return this.activeCombats.get(userId);
+    async getActiveCombat(userId) {
+        // First check in-memory storage
+        let combat = this.activeCombats.get(userId);
+        
+        // If not found and database is available, check database
+        if (!combat && this.useDatabase) {
+            try {
+                const { storage } = require('../server/storage');
+                const dbCombat = await storage.getCombatSession(userId);
+                if (dbCombat) {
+                    // Convert database format to in-memory format
+                    combat = {
+                        userId: dbCombat.userId,
+                        enemy: dbCombat.enemy,
+                        userHealth: dbCombat.userHealth,
+                        userMaxHealth: dbCombat.userMaxHealth,
+                        enemyHealth: dbCombat.enemyHealth,
+                        enemyMaxHealth: dbCombat.enemyMaxHealth,
+                        turn: dbCombat.turn,
+                        moves: dbCombat.moves || [],
+                        startTime: dbCombat.startTime,
+                        status: dbCombat.status,
+                        defendBonus: dbCombat.defendBonus || 0
+                    };
+                    // Cache in memory
+                    this.activeCombats.set(userId, combat);
+                }
+            } catch (error) {
+                console.log('[INFO] Using in-memory combat storage (PostgreSQL not available)');
+            }
+        }
+        
+        return combat;
     }
 
     // Process combat action

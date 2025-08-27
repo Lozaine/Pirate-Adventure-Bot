@@ -22,7 +22,7 @@ module.exports = {
         }
         
         // Check if user has an active combat session
-        const activeCombat = combatSystem.getActiveCombat(userId);
+        const activeCombat = await combatSystem.getActiveCombat(userId);
         
         if (activeCombat) {
             // Display current combat status

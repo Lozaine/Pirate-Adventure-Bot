@@ -102,7 +102,8 @@ client.on('interactionCreate', async interaction => {
         // Handle combat button interactions
         if (interaction.customId.startsWith('combat_')) {
             try {
-                const action = interaction.customId.split('_')[1]; // attack, defend, special, flee
+                const customIdParts = interaction.customId.split('_');
+                const action = customIdParts[1]; // attack, defend, special, flee, fight
                 const userId = interaction.user.id;
                 const userData = database.getUser(userId);
                 
@@ -117,7 +118,36 @@ client.on('interactionCreate', async interaction => {
                 const config = require('./config.js');
                 const { EmbedBuilder } = require('discord.js');
                 
-                // Process the combat action
+                // Handle initial fight button from exploration
+                if (action === 'fight') {
+                    const enemyId = customIdParts[2]; // Get enemy ID from custom ID
+                    const enemies = require('./data/enemies.js');
+                    
+                    // Get the enemy data - for now we'll generate a new enemy since we don't store the original
+                    // In a full implementation, you'd store the encounter data temporarily
+                    const enemy = enemies.generateEnemyForLevel(userData.level, userData.currentLocation);
+                    
+                    // Start the combat session
+                    const combatSession = await combatSystem.startCombat(userId, enemy);
+                    
+                    if (!combatSession) {
+                        return interaction.reply({
+                            content: '❌ Failed to start combat session!',
+                            ephemeral: true
+                        });
+                    }
+                    
+                    // Create combat embed and buttons
+                    const combatEmbed = combatSystem.createCombatEmbed(combatSession, userData);
+                    const combatButtons = combatSystem.createCombatButtons(combatSession);
+                    
+                    return interaction.update({
+                        embeds: [combatEmbed],
+                        components: combatButtons
+                    });
+                }
+                
+                // Process regular combat actions
                 const result = combatSystem.processCombatAction(userId, action, userData);
                 
                 if (!result.success) {
