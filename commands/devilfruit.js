@@ -132,8 +132,8 @@ async function handleSearch(interaction, userData) {
             );
             
         // Give small consolation rewards
-        userData.experience += 25;
-        userData.berries += 500;
+        userData.experience = (userData.experience || 0) + 25;
+        userData.berries = (userData.berries || 0) + 500;
         database.updateUser(userId, userData);
         
         await interaction.reply({ embeds: [embed] });

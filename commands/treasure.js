@@ -42,9 +42,9 @@ module.exports = {
         
         if (treasureResult.found) {
             // Treasure found!
-            userData.treasuresFound += 1;
-            userData.berries += treasureResult.berries;
-            userData.experience += treasureResult.experience;
+            userData.treasuresFound = (userData.treasuresFound || 0) + 1;
+            userData.berries = (userData.berries || 0) + treasureResult.berries;
+            userData.experience = (userData.experience || 0) + treasureResult.experience;
             
             // Add treasure item to inventory if it's equipment
             if (treasureResult.item) {
@@ -83,7 +83,7 @@ module.exports = {
         } else {
             // No treasure found
             const consolationExp = 10;
-            userData.experience += consolationExp;
+            userData.experience = (userData.experience || 0) + consolationExp;
             
             embed = new EmbedBuilder()
                 .setColor(config.COLORS.PRIMARY)

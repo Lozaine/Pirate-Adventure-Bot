@@ -107,7 +107,9 @@ module.exports = {
 
 async function handleBrowse(interaction, userData) {
     const currentPage = 0; // Start with first category
-    const embed = createCategorizedShopEmbed(currentPage, userData.berries);
+    // Ensure berries field exists and has a valid value
+    const berries = userData.berries || 0;
+    const embed = createCategorizedShopEmbed(currentPage, berries);
     
     // Create navigation buttons - we have multiple categories
     const totalCategories = getShopCategories().length;
@@ -147,16 +149,19 @@ async function handleBuy(interaction, userData) {
         return await interaction.reply({ embeds: [embed] });
     }
     
+    // Ensure berries field exists and has a valid value
+    const berries = userData.berries || 0;
+    
     // Check if user has enough berries
-    if (userData.berries < item.price) {
+    if (berries < item.price) {
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.ERROR)
             .setTitle('💰 Insufficient Berries')
             .setDescription(`You don't have enough berries to buy **${item.name}**!`)
             .addFields(
                 { name: '💰 Price', value: `₿${item.price.toLocaleString()}`, inline: true },
-                { name: '💳 Your Berries', value: `₿${userData.berries.toLocaleString()}`, inline: true },
-                { name: '❌ Needed', value: `₿${(item.price - userData.berries).toLocaleString()}`, inline: true }
+                { name: '💳 Your Berries', value: `₿${berries.toLocaleString()}`, inline: true },
+                { name: '❌ Needed', value: `₿${(item.price - berries).toLocaleString()}`, inline: true }
             );
         return await interaction.reply({ embeds: [embed] });
     }
@@ -175,7 +180,7 @@ async function handleBuy(interaction, userData) {
             .addFields(
                 { name: '🛒 Item', value: item.name, inline: true },
                 { name: '💰 Price', value: `₿${item.price.toLocaleString()}`, inline: true },
-                { name: '💳 Remaining Berries', value: `₿${purchaseResult.userData.berries.toLocaleString()}`, inline: true },
+                { name: '💳 Remaining Berries', value: `₿${(purchaseResult.userData.berries || 0).toLocaleString()}`, inline: true },
                 { name: '📦 Description', value: item.description }
             );
             
@@ -229,7 +234,7 @@ async function handleSell(interaction, userData) {
             .addFields(
                 { name: '🛒 Item', value: inventoryItem.name, inline: true },
                 { name: '💰 Sale Price', value: `₿${sellResult.sellPrice.toLocaleString()}`, inline: true },
-                { name: '💳 Total Berries', value: `₿${sellResult.userData.berries.toLocaleString()}`, inline: true }
+                { name: '💳 Total Berries', value: `₿${(sellResult.userData.berries || 0).toLocaleString()}`, inline: true }
             );
             
         await interaction.reply({ embeds: [embed] });
@@ -248,10 +253,10 @@ async function handleInventory(interaction, userData) {
     if (inventory.length === 0) {
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.WARNING)
-            .setTitle('📦 Empty Inventory')
+            .setTitle('�� Empty Inventory')
             .setDescription('Your inventory is empty! Visit the shop to buy items.')
             .addFields(
-                { name: '💰 Your Berries', value: `₿${userData.berries.toLocaleString()}` },
+                { name: '💰 Your Berries', value: `₿${(userData.berries || 0).toLocaleString()}` },
                 { name: '🛒 Shop', value: 'Use `/shop browse` to see available items!' }
             );
         return await interaction.reply({ embeds: [embed] });
@@ -269,7 +274,7 @@ async function handleInventory(interaction, userData) {
         .setColor(config.COLORS.PRIMARY)
         .setTitle('📦 Your Inventory')
         .setDescription(`You have ${inventory.length} items in your inventory.`)
-        .addFields({ name: '💰 Berries', value: `₿${userData.berries.toLocaleString()}`, inline: true });
+                    .addFields({ name: '💰 Berries', value: `₿${(userData.berries || 0).toLocaleString()}`, inline: true });
     
     // Add fields for each item type
     for (const [type, items] of Object.entries(groupedItems)) {

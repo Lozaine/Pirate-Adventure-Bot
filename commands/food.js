@@ -106,13 +106,13 @@ async function handleFoodMenu(interaction, userData) {
         .setColor(config.COLORS.PRIMARY)
         .setTitle('🍖 Food & Drink Menu')
         .setDescription('Browse delicious food and drinks that provide temporary combat bonuses!')
-        .addFields({ name: '💰 Your Berries', value: `₿${userData.berries.toLocaleString()}`, inline: true });
+        .addFields({ name: '💰 Your Berries', value: `₿${(userData.berries || 0).toLocaleString()}`, inline: true });
     
     Object.entries(categories).forEach(([key, category]) => {
         if (category.items.length === 0) return;
         
         const itemList = category.items.map(item => {
-            const affordable = userData.berries >= item.price ? '✅' : '❌';
+            const affordable = (userData.berries || 0) >= item.price ? '✅' : '❌';
             const effects = [];
             if (item.effects.heal) effects.push(`+${item.effects.heal} HP`);
             if (item.effects.attack) effects.push(`+${item.effects.attack} ATK`);

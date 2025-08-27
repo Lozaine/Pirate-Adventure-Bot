@@ -208,7 +208,7 @@ async function handleInfo(interaction, userData) {
             { name: '👥 Members', value: `${targetCrew.members.length}`, inline: true },
             { name: '⭐ Crew Level', value: `${targetCrew.level}`, inline: true },
             { name: '🏆 Reputation', value: `${targetCrew.reputation}`, inline: true },
-            { name: '💰 Bounty', value: `₿${targetCrew.bounty.toLocaleString()}`, inline: true },
+            { name: '💰 Bounty', value: `₿${(targetCrew.bounty || 0).toLocaleString()}`, inline: true },
             { name: '🗺️ Territories', value: `${targetCrew.territories.length}`, inline: true },
             { name: '👥 Crew Roster', value: members.slice(0, 10).join('\n') || 'No members' }
         );

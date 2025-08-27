@@ -90,14 +90,14 @@ module.exports = {
                     );
                     
                 // Apply rewards
-                userData.experience += explorationResult.expReward;
-                userData.berries += explorationResult.berryReward;
+                userData.experience = (userData.experience || 0) + explorationResult.expReward;
+                userData.berries = (userData.berries || 0) + explorationResult.berryReward;
                 break;
                 
             case 'treasure_found':
-                userData.treasuresFound += 1;
-                userData.berries += explorationResult.treasure.value;
-                userData.experience += explorationResult.expReward;
+                userData.treasuresFound = (userData.treasuresFound || 0) + 1;
+                userData.berries = (userData.berries || 0) + explorationResult.treasure.value;
+                userData.experience = (userData.experience || 0) + explorationResult.expReward;
                 database.updateUser(userId, userData);
                 
                 embed = new EmbedBuilder()
@@ -114,9 +114,10 @@ module.exports = {
                 break;
                 
             case 'new_location':
-                if (!userData.locationsVisited.includes(explorationResult.location)) {
+                if (!(userData.locationsVisited || []).includes(explorationResult.location)) {
+                    if (!userData.locationsVisited) userData.locationsVisited = [];
                     userData.locationsVisited.push(explorationResult.location);
-                    userData.experience += explorationResult.expReward;
+                    userData.experience = (userData.experience || 0) + explorationResult.expReward;
                     database.updateUser(userId, userData);
                 }
                 
@@ -142,7 +143,7 @@ module.exports = {
                         { name: '🎁 Small Reward', value: `**${explorationResult.expReward} EXP**` }
                     );
                     
-                userData.experience += explorationResult.expReward;
+                userData.experience = (userData.experience || 0) + explorationResult.expReward;
                 database.updateUser(userId, userData);
                 break;
         }
