@@ -375,8 +375,15 @@ class CombatSystem {
     }
 
     createCombatEmbed(combat, userData) {
-        const userHealthPercent = (combat.userHealth / combat.userMaxHealth) * 100;
-        const enemyHealthPercent = (combat.enemyHealth / combat.enemyMaxHealth) * 100;
+        let userHealthPercent = 0;
+        if (combat.userMaxHealth > 0) {
+            userHealthPercent = (combat.userHealth / combat.userMaxHealth) * 100;
+        }
+
+        let enemyHealthPercent = 0;
+        if (combat.enemyMaxHealth > 0) {
+            enemyHealthPercent = (combat.enemyHealth / combat.enemyMaxHealth) * 100;
+        }
 
         const userHealthBar = this.createHealthBar(userHealthPercent);
         const enemyHealthBar = this.createHealthBar(enemyHealthPercent);
