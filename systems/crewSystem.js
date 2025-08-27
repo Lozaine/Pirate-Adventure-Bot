@@ -41,8 +41,8 @@ class CrewSystem {
         return crews.find(crew => crew.name.toLowerCase() === name.toLowerCase());
     }
 
-    inviteUser(crewId, userId) {
-        const crew = database.getCrew(crewId);
+    async inviteUser(crewId, userId) {
+        const crew = await database.getCrew(crewId);
         if (!crew) {
             return { success: false, error: 'Crew not found' };
         }
@@ -70,8 +70,8 @@ class CrewSystem {
         return { success: true };
     }
 
-    joinCrew(crewId, userId) {
-        const crew = database.getCrew(crewId);
+    async joinCrew(crewId, userId) {
+        const crew = await database.getCrew(crewId);
         if (!crew) {
             return { success: false, error: 'Crew not found' };
         }
@@ -98,13 +98,13 @@ class CrewSystem {
         }
 
         // Update crew in database
-        database.updateCrew(crewId, crew);
+        await database.updateCrew(crewId, crew);
 
         return { success: true, crew: crew };
     }
 
-    leaveCrew(crewId, userId) {
-        const crew = database.getCrew(crewId);
+    async leaveCrew(crewId, userId) {
+        const crew = await database.getCrew(crewId);
         if (!crew) {
             return { success: false, error: 'Crew not found' };
         }
@@ -124,7 +124,7 @@ class CrewSystem {
                 const newCaptainData = await database.getUser(newCaptain);
                 if (newCaptainData) {
                     newCaptainData.crewRole = 'captain';
-                    database.updateUser(newCaptain, newCaptainData);
+                    await database.updateUser(newCaptain, newCaptainData);
                 }
             } else {
                 // Last member leaving, delete crew
@@ -138,13 +138,13 @@ class CrewSystem {
         crew.lastActive = new Date().toISOString();
 
         // Update crew in database
-        database.updateCrew(crewId, crew);
+        await database.updateCrew(crewId, crew);
 
         return { success: true, crew: crew };
     }
 
-    kickMember(crewId, targetUserId) {
-        const crew = database.getCrew(crewId);
+    async kickMember(crewId, targetUserId) {
+        const crew = await database.getCrew(crewId);
         if (!crew) {
             return { success: false, error: 'Crew not found' };
         }
@@ -162,7 +162,7 @@ class CrewSystem {
         crew.lastActive = new Date().toISOString();
 
         // Update crew in database
-        database.updateCrew(crewId, crew);
+        await database.updateCrew(crewId, crew);
 
         return { success: true, crew: crew };
     }

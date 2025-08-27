@@ -266,7 +266,7 @@ async function handleInvite(interaction, userData) {
     }
     
     const crew = database.getCrew(userData.crewId);
-    const inviteResult = crewSystem.inviteUser(crew.id, targetUser.id);
+            const inviteResult = await crewSystem.inviteUser(crew.id, targetUser.id);
     
     if (inviteResult.success) {
         const embed = new EmbedBuilder()
@@ -329,7 +329,7 @@ async function handleJoin(interaction, userData) {
     }
     
     // Check if user has an invitation
-    const joinResult = crewSystem.joinCrew(targetCrew.id, userId);
+            const joinResult = await crewSystem.joinCrew(targetCrew.id, userId);
     
     if (joinResult.success) {
         // Update user data
@@ -369,7 +369,7 @@ async function handleLeave(interaction, userData) {
     }
     
     const crew = database.getCrew(userData.crewId);
-    const leaveResult = crewSystem.leaveCrew(userData.crewId, interaction.user.id);
+    const leaveResult = await crewSystem.leaveCrew(userData.crewId, interaction.user.id);
     
     if (leaveResult.success) {
         // Update user data
@@ -417,7 +417,7 @@ async function handleKick(interaction, userData) {
         return await interaction.reply({ embeds: [embed] });
     }
     
-    const kickResult = crewSystem.kickMember(userData.crewId, targetUser.id);
+    const kickResult = await crewSystem.kickMember(userData.crewId, targetUser.id);
     
     if (kickResult.success) {
         // Update target user data
