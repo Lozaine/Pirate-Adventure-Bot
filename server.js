@@ -9,6 +9,7 @@ app.use(express.static(path.join(__dirname)));
 
 // Favicon support
 app.get('/favicon.ico', (req, res) => {
+    res.type('image/png');
     res.sendFile(path.join(__dirname, 'favicon.png'));
 });
 
