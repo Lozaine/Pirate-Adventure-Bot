@@ -121,9 +121,18 @@ CREATE INDEX IF NOT EXISTS idx_crews_captain ON crews(captain);
 CREATE INDEX IF NOT EXISTS idx_combat_sessions_user_id ON combat_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_combat_sessions_status ON combat_sessions(status);
 
--- Add foreign key constraint for crew_id
-ALTER TABLE users ADD CONSTRAINT IF NOT EXISTS fk_users_crew_id 
-  FOREIGN KEY (crew_id) REFERENCES crews(id) ON DELETE SET NULL;
+-- Add foreign key constraint for crew_id (only if it doesn't exist)
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.table_constraints 
+        WHERE constraint_name = 'fk_users_crew_id' 
+        AND table_name = 'users'
+    ) THEN
+        ALTER TABLE users ADD CONSTRAINT fk_users_crew_id 
+        FOREIGN KEY (crew_id) REFERENCES crews(id) ON DELETE SET NULL;
+    END IF;
+END $$;
 `;
 
 async function setupDatabase() {
