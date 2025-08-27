@@ -1,0 +1,50 @@
+# Node dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Coverage and build outputs
+coverage/
+.nyc_output/
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors/IDE
+.vscode/
+.idea/
+*.iml
+
+# TypeScript
+*.tsbuildinfo
+
+# npm cache
+.npm/
+
+# Replit/Local tool state
+.local/
+
+# Misc
+*.swp
+*.swo
+
+# Keep Railway files tracked (do not ignore)
+!RAILWAY_DEPLOYMENT.md
+!railway.json
