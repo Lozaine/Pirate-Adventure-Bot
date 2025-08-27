@@ -56,8 +56,23 @@ client.once('ready', async () => {
 
 // Handle all interactions (commands and components)
 client.on('interactionCreate', async interaction => {
+    // Handle autocomplete interactions
+    if (interaction.isAutocomplete()) {
+        const command = client.commands.get(interaction.commandName);
+        if (!command || !command.autocomplete) {
+            console.error(`[ERROR] No autocomplete method found for ${interaction.commandName}.`);
+            return;
+        }
+
+        try {
+            await command.autocomplete(interaction);
+        } catch (error) {
+            console.error(`[ERROR] Error executing autocomplete for ${interaction.commandName}:`, error);
+        }
+    }
+    
     // Handle slash commands
-    if (interaction.isChatInputCommand()) {
+    else if (interaction.isChatInputCommand()) {
         const command = client.commands.get(interaction.commandName);
         if (!command) {
             console.error(`[ERROR] No command matching ${interaction.commandName} was found.`);
@@ -78,6 +93,85 @@ client.on('interactionCreate', async interaction => {
                 await interaction.followUp(errorMessage);
             } else {
                 await interaction.reply(errorMessage);
+            }
+        }
+    }
+    
+    // Handle button interactions
+    else if (interaction.isButton()) {
+        if (interaction.customId.startsWith('shop_page_')) {
+            try {
+                const page = parseInt(interaction.customId.split('_')[2]);
+                const userId = interaction.user.id;
+                const userData = database.getUser(userId);
+                
+                if (!userData) {
+                    return interaction.reply({
+                        content: '❌ You need to register first! Use `/register` to begin your pirate adventure.',
+                        ephemeral: true
+                    });
+                }
+                
+                const economySystem = require('./systems/economySystem.js');
+                const config = require('./config.js');
+                const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+                
+                const shopItems = economySystem.getShopItems();
+                const itemsPerPage = 8;
+                const pages = Math.ceil(shopItems.length / itemsPerPage);
+                
+                // Create shop embed for the requested page
+                const start = page * itemsPerPage;
+                const end = start + itemsPerPage;
+                const pageItems = shopItems.slice(start, end);
+                
+                const embed = new EmbedBuilder()
+                    .setColor(config.COLORS.PRIMARY)
+                    .setTitle('🏪 Merchant Shop')
+                    .setDescription('Welcome to the Grand Line\'s finest merchant shop!')
+                    .addFields({ name: '💰 Your Berries', value: `₿${userData.berries.toLocaleString()}`, inline: true });
+                
+                pageItems.forEach(item => {
+                    const affordable = userData.berries >= item.price ? '✅' : '❌';
+                    embed.addFields({
+                        name: `${affordable} ${item.name}`,
+                        value: `**₿${item.price.toLocaleString()}**\n${item.description}`,
+                        inline: true
+                    });
+                });
+                
+                embed.setFooter({ text: `Page ${page + 1}/${pages} • Use /shop buy <item> to purchase` });
+                
+                // Create navigation buttons
+                let components = [];
+                if (pages > 1) {
+                    const row = new ActionRowBuilder()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId(`shop_page_${Math.max(0, page - 1)}`)
+                                .setLabel('◀️ Previous')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setDisabled(page === 0),
+                            new ButtonBuilder()
+                                .setCustomId(`shop_page_${Math.min(pages - 1, page + 1)}`)
+                                .setLabel('Next ▶️')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setDisabled(page === pages - 1)
+                        );
+                    components.push(row);
+                }
+                
+                await interaction.update({
+                    embeds: [embed],
+                    components: components
+                });
+                
+            } catch (error) {
+                console.error('[ERROR] Error handling shop page navigation:', error);
+                await interaction.reply({
+                    content: '❌ There was an error loading that shop page!',
+                    ephemeral: true
+                });
             }
         }
     }

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const database = require('../database/database.js');
 const config = require('../config.js');
 const economySystem = require('../systems/economySystem.js');
@@ -113,7 +113,29 @@ async function handleBrowse(interaction, userData) {
     
     const embed = createShopEmbed(shopItems, currentPage, itemsPerPage, userData.berries);
     
-    await interaction.reply({ embeds: [embed] });
+    // Create navigation buttons if there are multiple pages
+    let components = [];
+    if (pages > 1) {
+        const row = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId(`shop_page_${Math.max(0, currentPage - 1)}`)
+                    .setLabel('◀️ Previous')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(currentPage === 0),
+                new ButtonBuilder()
+                    .setCustomId(`shop_page_${Math.min(pages - 1, currentPage + 1)}`)
+                    .setLabel('Next ▶️')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(currentPage === pages - 1)
+            );
+        components.push(row);
+    }
+    
+    await interaction.reply({ 
+        embeds: [embed], 
+        components: components 
+    });
 }
 
 async function handleBuy(interaction, userData) {
