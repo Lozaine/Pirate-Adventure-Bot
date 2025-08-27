@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
+    const allNavElements = document.querySelectorAll('.nav-link, [data-page]');
     const pageSection = document.querySelectorAll('.page-section');
 
     // Hamburger menu toggle
@@ -11,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
         navMenu.classList.toggle('active');
     });
 
-    // Navigation link handling
-    navLinks.forEach(link => {
+    // Navigation link handling (including footer legal links)
+    allNavElements.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             
@@ -24,8 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
             navLinks.forEach(l => l.classList.remove('active'));
             pageSection.forEach(section => section.classList.remove('active'));
             
-            // Add active class to clicked link
-            this.classList.add('active');
+            // Add active class to clicked link (only if it's a nav-link)
+            if (this.classList.contains('nav-link')) {
+                this.classList.add('active');
+            }
             
             // Show corresponding page section
             const targetPage = this.getAttribute('data-page');
