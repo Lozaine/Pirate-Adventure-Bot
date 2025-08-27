@@ -6,17 +6,49 @@
         "id": "1246691365304274989",
         "username": "aevumwaves",
         "level": 1,
-        "experience": 12,
+        "experience": 57,
         "health": 10,
         "maxHealth": 100,
-        "attack": 20,
+        "attack": 28,
         "defense": 10,
-        "berries": 955,
+        "berries": 104,
         "devilFruit": null,
         "devilFruitPower": 0,
-        "inventory": [],
+        "inventory": [
+          {
+            "id": "rusty_cutlass",
+            "name": "Rusty Cutlass",
+            "description": "An old cutlass that has seen better days, but still cuts true.",
+            "type": "weapon",
+            "rarity": "common",
+            "price": 500,
+            "sellPrice": 300,
+            "stats": {
+              "attack": 8,
+              "defense": 0,
+              "health": 0
+            },
+            "level": 1,
+            "quantity": 1,
+            "purchaseDate": "2025-08-27T08:55:45.962Z"
+          }
+        ],
         "equipment": {
-          "weapon": null,
+          "weapon": {
+            "id": "rusty_cutlass",
+            "name": "Rusty Cutlass",
+            "description": "An old cutlass that has seen better days, but still cuts true.",
+            "type": "weapon",
+            "rarity": "common",
+            "price": 500,
+            "sellPrice": 300,
+            "stats": {
+              "attack": 8,
+              "defense": 0,
+              "health": 0
+            },
+            "level": 1
+          },
           "armor": null,
           "accessory": null
         },
@@ -26,21 +58,31 @@
         "locationsVisited": [
           "East Blue"
         ],
-        "wins": 0,
-        "losses": 1,
-        "enemiesDefeated": 0,
+        "wins": 1,
+        "losses": 2,
+        "enemiesDefeated": 1,
         "allies": [],
         "treasuresFound": 1,
-        "lastExplore": "2025-08-27T08:44:11.781Z",
+        "lastExplore": "2025-08-27T08:57:56.549Z",
         "lastCombat": null,
-        "lastTreasure": "2025-08-27T08:25:09.128Z",
+        "lastTreasure": "2025-08-27T08:57:44.211Z",
         "lastDevilFruit": null,
         "createdAt": "2025-08-27T08:07:50.749Z",
-        "lastActive": null
+        "lastActive": null,
+        "activeFoodBuffs": [
+          {
+            "id": "sake",
+            "name": "Premium Sake",
+            "attack": 8,
+            "defense": -2,
+            "expiresAt": 1756285925854
+          }
+        ],
+        "lastFood": 1756285025854
       }
     ]
   ],
   "crews": [],
   "guilds": [],
-  "lastSaved": "2025-08-27T08:51:10.894Z"
+  "lastSaved": "2025-08-27T09:16:10.896Z"
 }
