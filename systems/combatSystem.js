@@ -254,6 +254,9 @@ class CombatSystem {
                 timestamp: new Date().toISOString()
             });
 
+            // Reset turn back to user after enemy attack
+            combat.turn = 'user';
+
             return {
                 action: 'attack',
                 damage: enemyDamage,
@@ -265,6 +268,9 @@ class CombatSystem {
                 action: 'defend',
                 timestamp: new Date().toISOString()
             });
+
+            // Reset turn back to user after enemy defend
+            combat.turn = 'user';
 
             return {
                 action: 'defend',
