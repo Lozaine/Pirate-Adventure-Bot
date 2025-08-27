@@ -10,12 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### Wiki System Addition (Latest)
-- Added comprehensive `/wiki` command with 8 detailed guide pages
-- Added `/guide` command as an alias to `/wiki`
-- Interactive dropdown navigation between guide sections
-- Complete coverage of all game systems and mechanics
-- Strategic tips and progression guides for all player levels
+### Combat & Shop System Fixes (Latest)
+- Fixed combat system Fight & Flee buttons - now fully functional
+- Added proper button interaction handling for all combat actions
+- Fixed shop browsing with working pagination (Previous/Next buttons)
+- Implemented autocomplete for shop buy command
+- Removed `/guide` command, keeping only `/wiki` for documentation
+- Improved error handling for Discord interactions
 
 ## System Architecture
 

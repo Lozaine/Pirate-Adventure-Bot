@@ -99,7 +99,124 @@ client.on('interactionCreate', async interaction => {
     
     // Handle button interactions
     else if (interaction.isButton()) {
-        if (interaction.customId.startsWith('shop_page_')) {
+        // Handle combat button interactions
+        if (interaction.customId.startsWith('combat_')) {
+            try {
+                const action = interaction.customId.split('_')[1]; // attack, defend, special, flee
+                const userId = interaction.user.id;
+                const userData = database.getUser(userId);
+                
+                if (!userData) {
+                    return interaction.reply({
+                        content: '❌ You need to register first! Use `/register` to begin your pirate adventure.',
+                        ephemeral: true
+                    });
+                }
+                
+                const combatSystem = require('./systems/combatSystem.js');
+                const config = require('./config.js');
+                const { EmbedBuilder } = require('discord.js');
+                
+                // Process the combat action
+                const result = combatSystem.processCombatAction(userId, action, userData);
+                
+                if (!result.success) {
+                    return interaction.reply({
+                        content: `❌ ${result.error}`,
+                        ephemeral: true
+                    });
+                }
+                
+                // Update user data in database
+                database.updateUser(userId, userData);
+                
+                // Create response embed based on action result
+                let responseEmbed;
+                let components = [];
+                
+                if (result.result.combatEnd) {
+                    // Combat ended - show results
+                    const endResult = result.result.combatEnd;
+                    responseEmbed = new EmbedBuilder()
+                        .setColor(endResult.result === 'victory' ? config.COLORS.SUCCESS : 
+                                 endResult.result === 'defeat' ? config.COLORS.ERROR : config.COLORS.WARNING)
+                        .setTitle(endResult.result === 'victory' ? '🏆 Victory!' : 
+                                 endResult.result === 'defeat' ? '💀 Defeat!' : '🏃 Fled!')
+                        .setDescription(endResult.result === 'victory' ? 'You emerged victorious from the battle!' :
+                                       endResult.result === 'defeat' ? 'You were defeated in battle...' :
+                                       'You successfully escaped from the battle!');
+                    
+                    if (endResult.rewards) {
+                        responseEmbed.addFields(
+                            { name: '💰 Berries Earned', value: `₿${endResult.rewards.berries.toLocaleString()}`, inline: true },
+                            { name: '⭐ Experience Gained', value: `${endResult.rewards.experience} XP`, inline: true }
+                        );
+                    }
+                    
+                    if (endResult.levelUp) {
+                        responseEmbed.addFields({
+                            name: '🎉 Level Up!',
+                            value: `Level ${endResult.levelUp.oldLevel} → ${endResult.levelUp.newLevel}\n+${endResult.levelUp.healthGain} Health\n+${endResult.levelUp.attackGain} Attack\n+${endResult.levelUp.defenseGain} Defense`
+                        });
+                    }
+                    
+                    if (endResult.penalties) {
+                        responseEmbed.addFields({
+                            name: '💸 Penalties',
+                            value: `Lost ${endResult.penalties.berryLoss} berries\nHealth reduced to ${userData.health}`
+                        });
+                    }
+                    
+                } else {
+                    // Combat continues - show updated battle state
+                    responseEmbed = combatSystem.createCombatEmbed(result.combat, userData);
+                    components = combatSystem.createCombatButtons(result.combat);
+                    
+                    // Add action result to embed
+                    const actionResult = result.result;
+                    let actionText = '';
+                    
+                    if (actionResult.action === 'attack') {
+                        actionText = `⚔️ You dealt **${actionResult.damage}** damage!`;
+                    } else if (actionResult.action === 'defend') {
+                        actionText = `🛡️ ${actionResult.message}`;
+                    } else if (actionResult.action === 'special') {
+                        if (actionResult.failed) {
+                            actionText = `❌ ${actionResult.message}`;
+                        } else {
+                            actionText = `🔮 You used **${actionResult.devilFruit.name}** and dealt **${actionResult.damage}** damage!`;
+                        }
+                    } else if (actionResult.action === 'flee') {
+                        actionText = actionResult.fled ? '🏃 You successfully escaped!' : `❌ ${actionResult.message}`;
+                    }
+                    
+                    if (actionResult.enemyAction) {
+                        const enemyAction = actionResult.enemyAction;
+                        if (enemyAction.action === 'attack') {
+                            actionText += `\n👹 ${result.combat.enemy.name} dealt **${enemyAction.damage}** damage to you!`;
+                        } else if (enemyAction.action === 'defend') {
+                            actionText += `\n🛡️ ${enemyAction.message}`;
+                        }
+                    }
+                    
+                    responseEmbed.addFields({ name: '📜 Battle Log', value: actionText });
+                }
+                
+                await interaction.update({
+                    embeds: [responseEmbed],
+                    components: components
+                });
+                
+            } catch (error) {
+                console.error('[ERROR] Error handling combat action:', error);
+                await interaction.reply({
+                    content: '❌ There was an error processing your combat action!',
+                    ephemeral: true
+                });
+            }
+        }
+        // Handle shop pagination buttons
+        else if (interaction.customId.startsWith('shop_page_')) {
             try {
                 const page = parseInt(interaction.customId.split('_')[2]);
                 const userId = interaction.user.id;
@@ -543,10 +660,14 @@ client.on('interactionCreate', async interaction => {
                 
             } catch (error) {
                 console.error('[ERROR] Error handling wiki navigation:', error);
-                await interaction.reply({
-                    content: '❌ There was an error loading that wiki page!',
-                    ephemeral: true
-                });
+                
+                // Check if interaction has already been handled
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({
+                        content: '❌ There was an error loading that wiki page!',
+                        ephemeral: true
+                    });
+                }
             }
         }
     }

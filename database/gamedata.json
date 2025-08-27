@@ -1,6 +1,46 @@
 {
-  "users": [],
+  "users": [
+    [
+      "1246691365304274989",
+      {
+        "id": "1246691365304274989",
+        "username": "aevumwaves",
+        "level": 1,
+        "experience": 0,
+        "health": 100,
+        "maxHealth": 100,
+        "attack": 20,
+        "defense": 10,
+        "berries": 1000,
+        "devilFruit": null,
+        "devilFruitPower": 0,
+        "inventory": [],
+        "equipment": {
+          "weapon": null,
+          "armor": null,
+          "accessory": null
+        },
+        "crewId": null,
+        "crewRole": "member",
+        "currentLocation": "East Blue",
+        "locationsVisited": [
+          "East Blue"
+        ],
+        "wins": 0,
+        "losses": 0,
+        "enemiesDefeated": 0,
+        "allies": [],
+        "treasuresFound": 0,
+        "lastExplore": "2025-08-27T06:37:57.130Z",
+        "lastCombat": null,
+        "lastTreasure": null,
+        "lastDevilFruit": null,
+        "createdAt": "2025-08-27T06:22:44.685Z",
+        "lastActive": null
+      }
+    ]
+  ],
   "crews": [],
   "guilds": [],
-  "lastSaved": "2025-08-27T06:18:09.219Z"
+  "lastSaved": "2025-08-27T06:39:15.676Z"
 }
