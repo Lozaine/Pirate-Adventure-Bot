@@ -106,16 +106,13 @@ module.exports = {
 };
 
 async function handleBrowse(interaction, userData) {
-    const shopItems = economySystem.getShopItems();
-    const itemsPerPage = 8;
-    const pages = Math.ceil(shopItems.length / itemsPerPage);
-    const currentPage = 0;
+    const currentPage = 0; // Start with first category
+    const embed = createCategorizedShopEmbed(currentPage, userData.berries);
     
-    const embed = createShopEmbed(shopItems, currentPage, itemsPerPage, userData.berries);
-    
-    // Create navigation buttons if there are multiple pages
+    // Create navigation buttons - we have multiple categories
+    const totalCategories = getShopCategories().length;
     let components = [];
-    if (pages > 1) {
+    if (totalCategories > 1) {
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
@@ -124,10 +121,10 @@ async function handleBrowse(interaction, userData) {
                     .setStyle(ButtonStyle.Secondary)
                     .setDisabled(currentPage === 0),
                 new ButtonBuilder()
-                    .setCustomId(`shop_page_${Math.min(pages - 1, currentPage + 1)}`)
+                    .setCustomId(`shop_page_${Math.min(totalCategories - 1, currentPage + 1)}`)
                     .setLabel('Next ▶️')
                     .setStyle(ButtonStyle.Secondary)
-                    .setDisabled(currentPage === pages - 1)
+                    .setDisabled(currentPage === totalCategories - 1)
             );
         components.push(row);
     }
@@ -301,54 +298,95 @@ async function handleInventory(interaction, userData) {
     await interaction.reply({ embeds: [embed] });
 }
 
-function createShopEmbed(shopItems, page, itemsPerPage, userBerries) {
-    // Group items by category
-    const categories = {
-        'weapon': { name: '⚔️ Weapons', items: [] },
-        'armor': { name: '🛡️ Armor', items: [] },
-        'accessory': { name: '💍 Accessories', items: [] },
-        'food': { name: '🍖 Food & Drink', items: [] },
-        'consumable': { name: '🧪 Consumables', items: [] },
-        'tool': { name: '🔧 Tools', items: [] },
-        'material': { name: '💎 Materials', items: [] }
-    };
+function getShopCategories() {
+    return [
+        { key: 'accessory', name: '💍 Accessories', description: 'Rings, bandanas, and special items that provide stat bonuses' },
+        { key: 'weapon', name: '⚔️ Weapons', description: 'Swords, cutlasses, and other combat weapons' },
+        { key: 'armor', name: '🛡️ Armor', description: 'Protective gear including vests, coats, and suits' },
+        { key: 'food', name: '🍖 Food & Drink', description: 'Consumable items that provide healing and temporary buffs' },
+        { key: 'consumable', name: '🧪 Consumables', description: 'Single-use items with various effects' },
+        { key: 'tool', name: '🔧 Tools', description: 'Navigation and utility items for exploration' },
+        { key: 'material', name: '💎 Materials', description: 'Rare materials and crafting components' }
+    ];
+}
+
+function createCategorizedShopEmbed(categoryPage, userBerries) {
+    const categories = getShopCategories();
+    const currentCategory = categories[categoryPage];
+    const shopItems = economySystem.getShopItems();
     
-    // Sort items into categories
-    shopItems.forEach(item => {
-        const category = item.type || 'material';
-        if (categories[category]) {
-            categories[category].items.push(item);
-        } else {
-            categories['material'].items.push(item);
-        }
+    // Get items for current category
+    const categoryItems = shopItems.filter(item => {
+        const itemType = item.type || 'material';
+        return itemType === currentCategory.key;
     });
     
     const embed = new EmbedBuilder()
         .setColor(config.COLORS.PRIMARY)
-        .setTitle('🏪 Merchant Shop')
-        .setDescription('Welcome to the Grand Line\'s finest merchant shop! Browse by category:')
+        .setTitle(`🏪 ${currentCategory.name}`)
+        .setDescription(currentCategory.description)
         .addFields({ name: '💰 Your Berries', value: `₿${userBerries.toLocaleString()}`, inline: true });
     
-    // Display categories with items
-    Object.entries(categories).forEach(([categoryKey, category]) => {
-        if (category.items.length === 0) return;
-        
-        const itemList = category.items.map(item => {
+    if (categoryItems.length === 0) {
+        embed.addFields({
+            name: '📦 No Items Available',
+            value: 'This category is currently empty. Check back later!',
+            inline: false
+        });
+    } else {
+        // Add each item with full details
+        categoryItems.forEach(item => {
             const affordable = userBerries >= item.price ? '✅' : '❌';
-            const typeIcon = getItemTypeIcon(item.type);
-            return `${affordable} ${typeIcon} **${item.name}** - ₿${item.price.toLocaleString()}`;
-        }).join('\n');
-        
-        if (itemList.length > 0) {
+            let itemValue = `**₿${item.price.toLocaleString()}**\n${item.description}`;
+            
+            // Add stat bonuses if available
+            if (item.stats) {
+                let statText = '';
+                if (item.stats.attack > 0) statText += `+${item.stats.attack} Attack `;
+                if (item.stats.defense > 0) statText += `+${item.stats.defense} Defense `;
+                if (item.stats.health > 0) statText += `+${item.stats.health} Health `;
+                if (statText) itemValue += `\n📈 ${statText.trim()}`;
+            }
+            
+            // Add food effects if available
+            if (item.effects) {
+                let effectText = '';
+                if (item.effects.heal) effectText += `+${item.effects.heal} HP `;
+                if (item.effects.attack) effectText += `+${item.effects.attack} ATK `;
+                if (item.effects.defense) effectText += `+${item.effects.defense} DEF `;
+                if (effectText && item.duration) {
+                    const duration = Math.floor(item.duration / 60000);
+                    effectText += `(${duration}min)`;
+                }
+                if (effectText) itemValue += `\n🎊 ${effectText.trim()}`;
+            }
+            
+            // Add special properties
+            if (item.special) {
+                itemValue += `\n✨ ${item.special}`;
+            }
+            
+            // Add rarity indicator
+            const rarityEmojis = {
+                'common': '⚪',
+                'uncommon': '🟢', 
+                'rare': '🔵',
+                'epic': '🟣',
+                'legendary': '🟡'
+            };
+            const rarityEmoji = rarityEmojis[item.rarity] || '⚪';
+            
             embed.addFields({
-                name: category.name,
-                value: itemList.length > 1024 ? itemList.substring(0, 1021) + '...' : itemList,
+                name: `${affordable} ${rarityEmoji} ${item.name}`,
+                value: itemValue,
                 inline: false
             });
-        }
-    });
+        });
+    }
     
-    embed.setFooter({ text: 'Use /shop buy <item> to purchase • /food menu for food categories' });
+    embed.setFooter({ 
+        text: `Page ${categoryPage + 1}/${categories.length} • Use /shop buy <item> to purchase`
+    });
     
     return embed;
 }

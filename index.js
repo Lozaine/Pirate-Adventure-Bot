@@ -311,39 +311,22 @@ client.on('interactionCreate', async interaction => {
                     });
                 }
                 
-                const economySystem = require('./systems/economySystem.js');
                 const config = require('./config.js');
-                const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+                const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
                 
-                const shopItems = economySystem.getShopItems();
-                const itemsPerPage = 8;
-                const pages = Math.ceil(shopItems.length / itemsPerPage);
+                // Import shop functions
+                const shopCommand = require('./commands/shop.js');
                 
-                // Create shop embed for the requested page
-                const start = page * itemsPerPage;
-                const end = start + itemsPerPage;
-                const pageItems = shopItems.slice(start, end);
+                // Get the helper functions from shop.js module
+                const shopModule = require('./commands/shop.js');
                 
-                const embed = new EmbedBuilder()
-                    .setColor(config.COLORS.PRIMARY)
-                    .setTitle('🏪 Merchant Shop')
-                    .setDescription('Welcome to the Grand Line\'s finest merchant shop!')
-                    .addFields({ name: '💰 Your Berries', value: `₿${userData.berries.toLocaleString()}`, inline: true });
-                
-                pageItems.forEach(item => {
-                    const affordable = userData.berries >= item.price ? '✅' : '❌';
-                    embed.addFields({
-                        name: `${affordable} ${item.name}`,
-                        value: `**₿${item.price.toLocaleString()}**\n${item.description}`,
-                        inline: true
-                    });
-                });
-                
-                embed.setFooter({ text: `Page ${page + 1}/${pages} • Use /shop buy <item> to purchase` });
+                // Create shop embed for the requested category page
+                const totalCategories = 7; // Number of categories we have
+                const embed = createCategorizedShopEmbedForButton(page, userData.berries);
                 
                 // Create navigation buttons
                 let components = [];
-                if (pages > 1) {
+                if (totalCategories > 1) {
                     const row = new ActionRowBuilder()
                         .addComponents(
                             new ButtonBuilder()
@@ -352,12 +335,102 @@ client.on('interactionCreate', async interaction => {
                                 .setStyle(ButtonStyle.Secondary)
                                 .setDisabled(page === 0),
                             new ButtonBuilder()
-                                .setCustomId(`shop_page_${Math.min(pages - 1, page + 1)}`)
+                                .setCustomId(`shop_page_${Math.min(totalCategories - 1, page + 1)}`)
                                 .setLabel('Next ▶️')
                                 .setStyle(ButtonStyle.Secondary)
-                                .setDisabled(page === pages - 1)
+                                .setDisabled(page === totalCategories - 1)
                         );
                     components.push(row);
+                }
+
+                function createCategorizedShopEmbedForButton(categoryPage, userBerries) {
+                    const categories = [
+                        { key: 'accessory', name: '💍 Accessories', description: 'Rings, bandanas, and special items that provide stat bonuses' },
+                        { key: 'weapon', name: '⚔️ Weapons', description: 'Swords, cutlasses, and other combat weapons' },
+                        { key: 'armor', name: '🛡️ Armor', description: 'Protective gear including vests, coats, and suits' },
+                        { key: 'food', name: '🍖 Food & Drink', description: 'Consumable items that provide healing and temporary buffs' },
+                        { key: 'consumable', name: '🧪 Consumables', description: 'Single-use items with various effects' },
+                        { key: 'tool', name: '🔧 Tools', description: 'Navigation and utility items for exploration' },
+                        { key: 'material', name: '💎 Materials', description: 'Rare materials and crafting components' }
+                    ];
+                    const currentCategory = categories[categoryPage];
+                    const shopItems = economySystem.getShopItems();
+                    
+                    // Get items for current category
+                    const categoryItems = shopItems.filter(item => {
+                        const itemType = item.type || 'material';
+                        return itemType === currentCategory.key;
+                    });
+                    
+                    const { EmbedBuilder } = require('discord.js');
+                    const embed = new EmbedBuilder()
+                        .setColor(config.COLORS.PRIMARY)
+                        .setTitle(`🏪 ${currentCategory.name}`)
+                        .setDescription(currentCategory.description)
+                        .addFields({ name: '💰 Your Berries', value: `₿${userBerries.toLocaleString()}`, inline: true });
+                    
+                    if (categoryItems.length === 0) {
+                        embed.addFields({
+                            name: '📦 No Items Available',
+                            value: 'This category is currently empty. Check back later!',
+                            inline: false
+                        });
+                    } else {
+                        // Add each item with full details
+                        categoryItems.forEach(item => {
+                            const affordable = userBerries >= item.price ? '✅' : '❌';
+                            let itemValue = `**₿${item.price.toLocaleString()}**\n${item.description}`;
+                            
+                            // Add stat bonuses if available
+                            if (item.stats) {
+                                let statText = '';
+                                if (item.stats.attack > 0) statText += `+${item.stats.attack} Attack `;
+                                if (item.stats.defense > 0) statText += `+${item.stats.defense} Defense `;
+                                if (item.stats.health > 0) statText += `+${item.stats.health} Health `;
+                                if (statText) itemValue += `\n📈 ${statText.trim()}`;
+                            }
+                            
+                            // Add food effects if available
+                            if (item.effects) {
+                                let effectText = '';
+                                if (item.effects.heal) effectText += `+${item.effects.heal} HP `;
+                                if (item.effects.attack) effectText += `+${item.effects.attack} ATK `;
+                                if (item.effects.defense) effectText += `+${item.effects.defense} DEF `;
+                                if (effectText && item.duration) {
+                                    const duration = Math.floor(item.duration / 60000);
+                                    effectText += `(${duration}min)`;
+                                }
+                                if (effectText) itemValue += `\n🎊 ${effectText.trim()}`;
+                            }
+                            
+                            // Add special properties
+                            if (item.special) {
+                                itemValue += `\n✨ ${item.special}`;
+                            }
+                            
+                            // Add rarity indicator
+                            const rarityEmojis = {
+                                'common': '⚪',
+                                'uncommon': '🟢', 
+                                'rare': '🔵',
+                                'epic': '🟣',
+                                'legendary': '🟡'
+                            };
+                            const rarityEmoji = rarityEmojis[item.rarity] || '⚪';
+                            
+                            embed.addFields({
+                                name: `${affordable} ${rarityEmoji} ${item.name}`,
+                                value: itemValue,
+                                inline: false
+                            });
+                        });
+                    }
+                    
+                    embed.setFooter({ 
+                        text: `Page ${categoryPage + 1}/${categories.length} • Use /shop buy <item> to purchase`
+                    });
+                    
+                    return embed;
                 }
                 
                 await interaction.update({

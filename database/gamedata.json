@@ -6,7 +6,7 @@
         "id": "1246691365304274989",
         "username": "aevumwaves",
         "level": 1,
-        "experience": 2,
+        "experience": 12,
         "health": 10,
         "maxHealth": 100,
         "attack": 20,
@@ -33,7 +33,7 @@
         "treasuresFound": 1,
         "lastExplore": "2025-08-27T08:09:54.256Z",
         "lastCombat": null,
-        "lastTreasure": "2025-08-27T08:09:39.455Z",
+        "lastTreasure": "2025-08-27T08:25:09.128Z",
         "lastDevilFruit": null,
         "createdAt": "2025-08-27T08:07:50.749Z",
         "lastActive": null
@@ -42,5 +42,5 @@
   ],
   "crews": [],
   "guilds": [],
-  "lastSaved": "2025-08-27T08:21:27.730Z"
+  "lastSaved": "2025-08-27T08:35:12.242Z"
 }
