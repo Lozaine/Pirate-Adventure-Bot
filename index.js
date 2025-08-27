@@ -311,14 +311,9 @@ client.on('interactionCreate', async interaction => {
                     });
                 }
                 
+                const economySystem = require('./systems/economySystem.js');
                 const config = require('./config.js');
                 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-                
-                // Import shop functions
-                const shopCommand = require('./commands/shop.js');
-                
-                // Get the helper functions from shop.js module
-                const shopModule = require('./commands/shop.js');
                 
                 // Create shop embed for the requested category page
                 const totalCategories = 7; // Number of categories we have

@@ -31,7 +31,7 @@
         "enemiesDefeated": 0,
         "allies": [],
         "treasuresFound": 1,
-        "lastExplore": "2025-08-27T08:09:54.256Z",
+        "lastExplore": "2025-08-27T08:44:11.781Z",
         "lastCombat": null,
         "lastTreasure": "2025-08-27T08:25:09.128Z",
         "lastDevilFruit": null,
@@ -42,5 +42,5 @@
   ],
   "crews": [],
   "guilds": [],
-  "lastSaved": "2025-08-27T08:35:12.242Z"
+  "lastSaved": "2025-08-27T08:46:09.766Z"
 }
