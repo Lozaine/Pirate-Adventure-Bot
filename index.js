@@ -147,6 +147,58 @@ client.on('interactionCreate', async interaction => {
                     });
                 }
                 
+                // Handle flee button from exploration (before combat starts)
+                if (action === 'flee') {
+                    const { EmbedBuilder } = require('discord.js');
+                    const config = require('./config.js');
+                    const randomizer = require('./utils/randomizer.js');
+                    
+                    // Calculate flee chance
+                    const fleeChance = 50 + (userData.level * 2); // Higher level = better flee chance
+                    const success = randomizer.rollPercentage(Math.min(fleeChance, 80));
+                    
+                    const fleeEmbed = new EmbedBuilder()
+                        .setColor(success ? config.COLORS.SUCCESS : config.COLORS.WARNING)
+                        .setTitle(success ? '🏃 Successfully Escaped!' : '🚫 Escape Failed!')
+                        .setDescription(success ? 
+                            'You quickly fled from the encounter and avoided the battle!' :
+                            'You tried to flee but the enemy blocked your escape! You must fight!')
+                    
+                    if (success) {
+                        // Successful flee - just show the result
+                        return interaction.update({
+                            embeds: [fleeEmbed],
+                            components: []
+                        });
+                    } else {
+                        // Failed flee - start combat automatically
+                        const enemies = require('./data/enemies.js');
+                        const enemy = enemies.generateEnemyForLevel(userData.level, userData.currentLocation);
+                        
+                        const combatSession = await combatSystem.startCombat(userId, enemy);
+                        if (!combatSession) {
+                            return interaction.reply({
+                                content: '❌ Failed to start combat session!',
+                                ephemeral: true
+                            });
+                        }
+                        
+                        const combatEmbed = combatSystem.createCombatEmbed(combatSession, userData);
+                        const combatButtons = combatSystem.createCombatButtons(combatSession);
+                        
+                        // Add the flee attempt message to the combat embed
+                        combatEmbed.addFields({
+                            name: '🏃 Flee Attempt Failed',
+                            value: 'You tried to escape but the enemy blocked your path! Now you must fight!'
+                        });
+                        
+                        return interaction.update({
+                            embeds: [combatEmbed],
+                            components: combatButtons
+                        });
+                    }
+                }
+                
                 // Process regular combat actions
                 const result = combatSystem.processCombatAction(userId, action, userData);
                 
