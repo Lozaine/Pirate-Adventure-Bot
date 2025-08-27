@@ -44,11 +44,15 @@ const USER_SCHEMA = {
     // Treasures found
     treasuresFound: 0,
     
+    // Food system
+    activeFoodBuffs: [],
+    
     // Timestamps
     lastExplore: null,
     lastCombat: null,
     lastTreasure: null,
     lastDevilFruit: null,
+    lastFood: null,
     
     createdAt: null,
     lastActive: null

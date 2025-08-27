@@ -302,26 +302,66 @@ async function handleInventory(interaction, userData) {
 }
 
 function createShopEmbed(shopItems, page, itemsPerPage, userBerries) {
-    const start = page * itemsPerPage;
-    const end = start + itemsPerPage;
-    const pageItems = shopItems.slice(start, end);
+    // Group items by category
+    const categories = {
+        'weapon': { name: '⚔️ Weapons', items: [] },
+        'armor': { name: '🛡️ Armor', items: [] },
+        'accessory': { name: '💍 Accessories', items: [] },
+        'food': { name: '🍖 Food & Drink', items: [] },
+        'consumable': { name: '🧪 Consumables', items: [] },
+        'tool': { name: '🔧 Tools', items: [] },
+        'material': { name: '💎 Materials', items: [] }
+    };
+    
+    // Sort items into categories
+    shopItems.forEach(item => {
+        const category = item.type || 'material';
+        if (categories[category]) {
+            categories[category].items.push(item);
+        } else {
+            categories['material'].items.push(item);
+        }
+    });
     
     const embed = new EmbedBuilder()
         .setColor(config.COLORS.PRIMARY)
         .setTitle('🏪 Merchant Shop')
-        .setDescription('Welcome to the Grand Line\'s finest merchant shop!')
+        .setDescription('Welcome to the Grand Line\'s finest merchant shop! Browse by category:')
         .addFields({ name: '💰 Your Berries', value: `₿${userBerries.toLocaleString()}`, inline: true });
     
-    pageItems.forEach(item => {
-        const affordable = userBerries >= item.price ? '✅' : '❌';
-        embed.addFields({
-            name: `${affordable} ${item.name}`,
-            value: `**₿${item.price.toLocaleString()}**\n${item.description}`,
-            inline: true
-        });
+    // Display categories with items
+    Object.entries(categories).forEach(([categoryKey, category]) => {
+        if (category.items.length === 0) return;
+        
+        const itemList = category.items.map(item => {
+            const affordable = userBerries >= item.price ? '✅' : '❌';
+            const typeIcon = getItemTypeIcon(item.type);
+            return `${affordable} ${typeIcon} **${item.name}** - ₿${item.price.toLocaleString()}`;
+        }).join('\n');
+        
+        if (itemList.length > 0) {
+            embed.addFields({
+                name: category.name,
+                value: itemList.length > 1024 ? itemList.substring(0, 1021) + '...' : itemList,
+                inline: false
+            });
+        }
     });
     
-    embed.setFooter({ text: `Page ${page + 1}/${Math.ceil(shopItems.length / itemsPerPage)} • Use /shop buy <item> to purchase` });
+    embed.setFooter({ text: 'Use /shop buy <item> to purchase • /food menu for food categories' });
     
     return embed;
+}
+
+function getItemTypeIcon(type) {
+    const icons = {
+        'weapon': '⚔️',
+        'armor': '🛡️', 
+        'accessory': '💍',
+        'food': '🍖',
+        'consumable': '🧪',
+        'tool': '🔧',
+        'material': '💎'
+    };
+    return icons[type] || '📦';
 }

@@ -3,11 +3,26 @@ const database = require('../database/database.js');
 const config = require('../config.js');
 const enemies = require('../data/enemies.js');
 const randomizer = require('../utils/randomizer.js');
+const foodSystem = require('./foodSystem.js');
 
 class CombatSystem {
     constructor() {
         this.activeCombats = new Map(); // userId -> combat session (in-memory fallback)
         this.useDatabase = process.env.DATABASE_URL ? true : false;
+    }
+
+    // Calculate effective combat stats including food buffs
+    getEffectiveCombatStats(userData) {
+        // Clean up expired buffs and get active food bonuses
+        foodSystem.cleanupExpiredBuffs(userData);
+        const foodBonuses = foodSystem.calculateFoodBonuses(userData);
+        
+        return {
+            attack: userData.attack + foodBonuses.attack,
+            defense: userData.defense + foodBonuses.defense,
+            health: userData.health,
+            maxHealth: userData.maxHealth
+        };
     }
 
     // Start a new combat session
@@ -143,7 +158,8 @@ class CombatSystem {
     }
 
     processAttack(combat, userData) {
-        const userAttack = userData.attack + combat.defendBonus;
+        const effectiveStats = this.getEffectiveCombatStats(userData);
+        const userAttack = effectiveStats.attack + combat.defendBonus;
         const damage = Math.max(1, userAttack - Math.floor(combat.enemy.defense / 2));
         
         combat.enemyHealth = Math.max(0, combat.enemyHealth - damage);
@@ -193,7 +209,8 @@ class CombatSystem {
         }
 
         const powerLevel = userData.devilFruitPower || 1;
-        const specialDamage = Math.floor(userData.attack * (1 + powerLevel / 50)) + combat.defendBonus;
+        const effectiveStats = this.getEffectiveCombatStats(userData);
+        const specialDamage = Math.floor(effectiveStats.attack * (1 + powerLevel / 50)) + combat.defendBonus;
         const damage = Math.max(1, specialDamage - Math.floor(combat.enemy.defense / 3));
 
         combat.enemyHealth = Math.max(0, combat.enemyHealth - damage);
@@ -244,7 +261,8 @@ class CombatSystem {
         const enemyAction = randomizer.getRandomElement(actions);
 
         if (enemyAction === 'attack') {
-            const enemyDamage = Math.max(1, combat.enemy.attack - Math.floor(userData.defense / 2));
+            const effectiveStats = this.getEffectiveCombatStats(userData);
+            const enemyDamage = Math.max(1, combat.enemy.attack - Math.floor(effectiveStats.defense / 2));
             combat.userHealth = Math.max(0, combat.userHealth - enemyDamage);
 
             combat.moves.push({

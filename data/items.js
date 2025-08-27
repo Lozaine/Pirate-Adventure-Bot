@@ -201,6 +201,148 @@ const shopItems = [
         level: 30
     },
 
+    // Food Items
+    {
+        id: 'sea_king_meat',
+        name: 'Sea King Meat',
+        description: 'Massive chunk of meat from a Sea King. Restores health and boosts strength.',
+        type: 'food',
+        category: 'meat',
+        rarity: 'epic',
+        price: 800,
+        sellPrice: 400,
+        stackable: true,
+        effects: { heal: 150, attack: 10 },
+        duration: 1800000, // 30 minutes
+        level: 20
+    },
+    {
+        id: 'sanji_bento',
+        name: 'Sanji Special Bento',
+        description: 'A perfectly prepared meal that boosts all stats significantly.',
+        type: 'food',
+        category: 'prepared_meal',
+        rarity: 'legendary',
+        price: 2000,
+        sellPrice: 1200,
+        stackable: true,
+        effects: { heal: 200, attack: 15, defense: 15 },
+        duration: 3600000, // 1 hour
+        level: 30
+    },
+    {
+        id: 'cola',
+        name: 'Cola',
+        description: 'Refreshing drink that restores energy and provides a small speed boost.',
+        type: 'food',
+        category: 'beverage',
+        rarity: 'common',
+        price: 50,
+        sellPrice: 25,
+        stackable: true,
+        effects: { heal: 25, attack: 2 },
+        duration: 300000, // 5 minutes
+        level: 1
+    },
+    {
+        id: 'sake',
+        name: 'Premium Sake',
+        description: 'High-quality sake that boosts courage and fighting spirit.',
+        type: 'food',
+        category: 'beverage',
+        rarity: 'uncommon',
+        price: 200,
+        sellPrice: 120,
+        stackable: true,
+        effects: { heal: 75, attack: 8, defense: -2 },
+        duration: 900000, // 15 minutes
+        level: 10
+    },
+    {
+        id: 'milk',
+        name: 'Fresh Milk',
+        description: 'Nutritious milk that strengthens bones and boosts defense.',
+        type: 'food',
+        category: 'beverage',
+        rarity: 'common',
+        price: 75,
+        sellPrice: 40,
+        stackable: true,
+        effects: { heal: 40, defense: 5 },
+        duration: 600000, // 10 minutes
+        level: 5
+    },
+    {
+        id: 'ramen_bowl',
+        name: 'Steaming Ramen Bowl',
+        description: 'Hot, delicious ramen that warms the soul and restores vitality.',
+        type: 'food',
+        category: 'prepared_meal',
+        rarity: 'uncommon',
+        price: 300,
+        sellPrice: 180,
+        stackable: true,
+        effects: { heal: 120, attack: 5, defense: 8 },
+        duration: 1200000, // 20 minutes
+        level: 15
+    },
+    {
+        id: 'sea_salt',
+        name: 'Sea Salt',
+        description: 'Pure sea salt that enhances other foods and provides mineral boost.',
+        type: 'food',
+        category: 'ingredient',
+        rarity: 'common',
+        price: 25,
+        sellPrice: 15,
+        stackable: true,
+        effects: { defense: 3 },
+        duration: 1800000, // 30 minutes
+        level: 1
+    },
+    {
+        id: 'mystery_fruit',
+        name: 'Mystery Fruit',
+        description: 'A strange fruit with unknown effects. Could be beneficial or risky!',
+        type: 'food',
+        category: 'fruit',
+        rarity: 'rare',
+        price: 500,
+        sellPrice: 300,
+        stackable: true,
+        effects: { heal: 100, attack: -5, defense: 15 }, // Mixed effects for mystery
+        duration: 600000, // 10 minutes
+        level: 12
+    },
+    {
+        id: 'chef_special',
+        name: 'Chef\'s Special Plate',
+        description: 'An expertly crafted meal that provides exceptional nourishment.',
+        type: 'food',
+        category: 'prepared_meal',
+        rarity: 'epic',
+        price: 1200,
+        sellPrice: 720,
+        stackable: true,
+        effects: { heal: 250, attack: 12, defense: 10 },
+        duration: 2400000, // 40 minutes
+        level: 25
+    },
+    {
+        id: 'energy_bar',
+        name: 'High-Energy Bar',
+        description: 'Concentrated nutrition bar perfect for long adventures.',
+        type: 'food',
+        category: 'snack',
+        rarity: 'uncommon',
+        price: 150,
+        sellPrice: 90,
+        stackable: true,
+        effects: { heal: 60, attack: 6 },
+        duration: 900000, // 15 minutes
+        level: 8
+    },
+
     // Tools and Misc
     {
         id: 'log_pose',
