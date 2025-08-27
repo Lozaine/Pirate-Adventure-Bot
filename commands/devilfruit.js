@@ -27,7 +27,7 @@ module.exports = {
         
     async execute(interaction) {
         const userId = interaction.user.id;
-        const userData = database.getUser(userId);
+        const userData = await database.getUser(userId);
         
         if (!userData) {
             const embed = new EmbedBuilder()
@@ -187,7 +187,15 @@ async function handleTrain(interaction, userData) {
         return await interaction.reply({ embeds: [embed] });
     }
     
-    if (userData.devilFruitPower >= 100) {
+    // Ensure userData properties have default values to prevent NaN/undefined errors
+    const devilFruitPower = userData.devilFruitPower || 0;
+    const berries = userData.berries || 0;
+    const attack = userData.attack || 0;
+    const defense = userData.defense || 0;
+    const maxHealth = userData.maxHealth || 100;
+    const health = userData.health || 100;
+    
+    if (devilFruitPower >= 100) {
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.WARNING)
             .setTitle('⚡ Maximum Power')
@@ -196,12 +204,12 @@ async function handleTrain(interaction, userData) {
     }
     
     // Check if user has enough berries for training
-    const trainingCost = userData.devilFruitPower * 100 + 500;
-    if (userData.berries < trainingCost) {
+    const trainingCost = devilFruitPower * 100 + 500;
+    if (berries < trainingCost) {
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.ERROR)
             .setTitle('💰 Insufficient Berries')
-            .setDescription(`Training your Devil Fruit power costs **₿${trainingCost.toLocaleString()}**!\nYou only have **₿${userData.berries.toLocaleString()}**.`);
+            .setDescription(`Training your Devil Fruit power costs **₿${trainingCost.toLocaleString()}**!\nYou only have **₿${berries.toLocaleString()}**.`);
         return await interaction.reply({ embeds: [embed] });
     }
     
@@ -209,14 +217,14 @@ async function handleTrain(interaction, userData) {
     const trainingResult = devilFruitSystem.trainDevilFruit(userData);
     
     if (trainingResult.success) {
-        userData.berries -= trainingCost;
+        userData.berries = berries - trainingCost;
         userData.devilFruitPower = trainingResult.newPowerLevel;
         
         // Apply stat increases
-        userData.attack += trainingResult.statGains.attack;
-        userData.defense += trainingResult.statGains.defense;
-        userData.maxHealth += trainingResult.statGains.health;
-        userData.health = Math.min(userData.health + trainingResult.statGains.health, userData.maxHealth);
+        userData.attack = attack + trainingResult.statGains.attack;
+        userData.defense = defense + trainingResult.statGains.defense;
+        userData.maxHealth = maxHealth + trainingResult.statGains.health;
+        userData.health = Math.min(health + trainingResult.statGains.health, userData.maxHealth);
         
         database.updateUser(interaction.user.id, userData);
         
@@ -238,11 +246,11 @@ async function handleTrain(interaction, userData) {
             .setDescription('Your training session didn\'t go as planned. Your power level remains the same, but you still paid for the training.')
             .addFields(
                 { name: '💰 Cost', value: `₿${trainingCost.toLocaleString()}` },
-                { name: '🎯 Current Level', value: `${userData.devilFruitPower}/100` },
+                { name: '🎯 Current Level', value: `${devilFruitPower}/100` },
                 { name: '💡 Tip', value: 'Training success rate increases with higher levels!' }
             );
             
-        userData.berries -= trainingCost;
+        userData.berries = berries - trainingCost;
         database.updateUser(interaction.user.id, userData);
         
         await interaction.reply({ embeds: [embed] });

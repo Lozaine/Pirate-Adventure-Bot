@@ -12,7 +12,7 @@ module.exports = {
         const username = interaction.user.username;
         
         // Check if user already exists
-        const existingUser = database.getUser(userId);
+        const existingUser = await database.getUser(userId);
         if (existingUser) {
             const embed = new EmbedBuilder()
                 .setColor(config.COLORS.WARNING)

@@ -12,7 +12,7 @@ module.exports = {
         
     async execute(interaction, client) {
         const userId = interaction.user.id;
-        const userData = database.getUser(userId);
+        const userData = await database.getUser(userId);
         
         if (!userData) {
             const embed = new EmbedBuilder()

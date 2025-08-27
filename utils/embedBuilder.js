@@ -65,19 +65,32 @@ class CustomEmbedBuilder {
 
     // Character profile embed
     static characterProfile(userData, targetUser) {
+        // Ensure userData properties have default values to prevent NaN/undefined errors
+        const safeUserData = {
+            username: userData.username || 'Unknown',
+            level: userData.level || 1,
+            health: userData.health || 100,
+            maxHealth: userData.maxHealth || 100,
+            berries: userData.berries || 0,
+            attack: userData.attack || 20,
+            defense: userData.defense || 10,
+            currentLocation: userData.currentLocation || 'East Blue',
+            createdAt: userData.createdAt || new Date()
+        };
+
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.PRIMARY)
-            .setTitle(`🏴‍☠️ ${userData.username}'s Pirate Profile`)
+            .setTitle(`🏴‍☠️ ${safeUserData.username}'s Pirate Profile`)
             .setThumbnail(targetUser.displayAvatarURL())
             .addFields(
-                { name: '⭐ Level', value: `${userData.level}`, inline: true },
-                { name: '❤️ Health', value: `${userData.health}/${userData.maxHealth}`, inline: true },
-                { name: '💰 Berries', value: `₿${userData.berries.toLocaleString()}`, inline: true },
-                { name: '⚔️ Attack', value: `${userData.attack}`, inline: true },
-                { name: '🛡️ Defense', value: `${userData.defense}`, inline: true },
-                { name: '🗺️ Location', value: userData.currentLocation, inline: true }
+                { name: '⭐ Level', value: `${safeUserData.level}`, inline: true },
+                { name: '❤️ Health', value: `${safeUserData.health}/${safeUserData.maxHealth}`, inline: true },
+                { name: '💰 Berries', value: `₿${safeUserData.berries.toLocaleString()}`, inline: true },
+                { name: '⚔️ Attack', value: `${safeUserData.attack}`, inline: true },
+                { name: '🛡️ Defense', value: `${safeUserData.defense}`, inline: true },
+                { name: '🗺️ Location', value: safeUserData.currentLocation, inline: true }
             )
-            .setFooter({ text: `Pirate since ${new Date(userData.createdAt).toDateString()}` })
+            .setFooter({ text: `Pirate since ${new Date(safeUserData.createdAt).toDateString()}` })
             .setTimestamp();
 
         return embed;
@@ -85,19 +98,29 @@ class CustomEmbedBuilder {
 
     // Combat status embed
     static combatStatus(combat, userData) {
-        const userHealthPercent = (combat.userHealth / combat.userMaxHealth) * 100;
-        const enemyHealthPercent = (combat.enemyHealth / combat.enemyMaxHealth) * 100;
+        // Ensure combat data has default values to prevent NaN/undefined errors
+        const safeCombat = {
+            userHealth: combat.userHealth || 100,
+            userMaxHealth: combat.userMaxHealth || 100,
+            enemyHealth: combat.enemyHealth || 100,
+            enemyMaxHealth: combat.enemyMaxHealth || 100,
+            enemy: combat.enemy || { name: 'Unknown Enemy' },
+            turn: combat.turn || 'user'
+        };
+        
+        const userHealthPercent = (safeCombat.userHealth / safeCombat.userMaxHealth) * 100;
+        const enemyHealthPercent = (safeCombat.enemyHealth / safeCombat.enemyMaxHealth) * 100;
 
         const userHealthBar = this.createHealthBar(userHealthPercent);
         const enemyHealthBar = this.createHealthBar(enemyHealthPercent);
 
         return new EmbedBuilder()
             .setColor(config.COLORS.COMBAT)
-            .setTitle(`⚔️ Battle: ${userData.username} vs ${combat.enemy.name}`)
-            .setDescription(`Current turn: ${combat.turn === 'user' ? '**Your Turn**' : '**Enemy Turn**'}`)
+            .setTitle(`⚔️ Battle: ${userData.username || 'Unknown'} vs ${safeCombat.enemy.name}`)
+            .setDescription(`Current turn: ${safeCombat.turn === 'user' ? '**Your Turn**' : '**Enemy Turn**'}`)
             .addFields(
-                { name: `👤 ${userData.username} (Lv.${userData.level})`, value: `${userHealthBar}\n❤️ ${combat.userHealth}/${combat.userMaxHealth} HP`, inline: true },
-                { name: `👹 ${combat.enemy.name} (Lv.${combat.enemy.level})`, value: `${enemyHealthBar}\n❤️ ${combat.enemyHealth}/${combat.enemyMaxHealth} HP`, inline: true },
+                { name: `👤 ${userData.username || 'Unknown'} (Lv.${userData.level || 1})`, value: `${userHealthBar}\n❤️ ${safeCombat.userHealth}/${safeCombat.userMaxHealth} HP`, inline: true },
+                { name: `👹 ${safeCombat.enemy.name} (Lv.${safeCombat.enemy.level || 1})`, value: `${enemyHealthBar}\n❤️ ${safeCombat.enemyHealth}/${safeCombat.enemyMaxHealth} HP`, inline: true },
                 { name: '\u200B', value: '\u200B', inline: true }
             )
             .setTimestamp();
@@ -122,22 +145,32 @@ class CustomEmbedBuilder {
 
     // Shop item embed
     static shopItem(item, userBerries) {
-        const affordable = userBerries >= item.price ? '✅' : '❌';
+        // Ensure item and userBerries have default values to prevent NaN/undefined errors
+        const safeItem = {
+            name: item.name || 'Unknown Item',
+            description: item.description || 'No description available',
+            price: item.price || 0,
+            type: item.type || 'material',
+            rarity: item.rarity || 'common'
+        };
+        const safeBerries = userBerries || 0;
+        
+        const affordable = safeBerries >= safeItem.price ? '✅' : '❌';
         const embed = new EmbedBuilder()
-            .setColor(item.rarity === 'epic' ? config.COLORS.DEVIL_FRUIT : config.COLORS.PRIMARY)
-            .setTitle(`${affordable} ${item.name}`)
-            .setDescription(item.description)
+            .setColor(safeItem.rarity === 'epic' ? config.COLORS.DEVIL_FRUIT : config.COLORS.PRIMARY)
+            .setTitle(`${affordable} ${safeItem.name}`)
+            .setDescription(safeItem.description)
             .addFields(
-                { name: '💰 Price', value: `₿${item.price.toLocaleString()}`, inline: true },
-                { name: '🏷️ Type', value: item.type, inline: true },
-                { name: '⭐ Rarity', value: item.rarity, inline: true }
+                { name: '💰 Price', value: `₿${safeItem.price.toLocaleString()}`, inline: true },
+                { name: '🏷️ Type', value: safeItem.type, inline: true },
+                { name: '⭐ Rarity', value: safeItem.rarity, inline: true }
             );
 
-        if (item.stats) {
+        if (safeItem.stats) {
             let statText = '';
-            if (item.stats.attack > 0) statText += `⚔️ +${item.stats.attack} Attack\n`;
-            if (item.stats.defense > 0) statText += `🛡️ +${item.stats.defense} Defense\n`;
-            if (item.stats.health > 0) statText += `❤️ +${item.stats.health} Health\n`;
+            if (safeItem.stats.attack > 0) statText += `⚔️ +${safeItem.stats.attack} Attack\n`;
+            if (safeItem.stats.defense > 0) statText += `🛡️ +${safeItem.stats.defense} Defense\n`;
+            if (safeItem.stats.health > 0) statText += `❤️ +${safeItem.stats.health} Health\n`;
             
             if (statText) {
                 embed.addFields({ name: '📈 Stats', value: statText, inline: true });
@@ -149,20 +182,35 @@ class CustomEmbedBuilder {
 
     // Crew information embed
     static crewInfo(crew, members) {
+        // Ensure crew and members have default values to prevent NaN/undefined errors
+        const safeCrew = {
+            name: crew.name || 'Unknown Crew',
+            members: crew.members || [],
+            level: crew.level || 1,
+            reputation: crew.reputation || 0,
+            bounty: crew.bounty || 0,
+            territories: crew.territories || [],
+            victories: crew.victories || 0,
+            treasuresFound: crew.treasuresFound || 0,
+            locationsDiscovered: crew.locationsDiscovered || [],
+            createdAt: crew.createdAt || new Date()
+        };
+        const safeMembers = members || [];
+        
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.PRIMARY)
-            .setTitle(`🏴‍☠️ ${crew.name}`)
+            .setTitle(`🏴‍☠️ ${safeCrew.name}`)
             .addFields(
-                { name: '👑 Captain', value: members.find(m => m.role === 'captain')?.username || 'Unknown', inline: true },
-                { name: '👥 Members', value: `${crew.members.length}`, inline: true },
-                { name: '⭐ Level', value: `${crew.level}`, inline: true },
-                { name: '🏆 Reputation', value: `${crew.reputation}`, inline: true },
-                { name: '💰 Bounty', value: `₿${crew.bounty.toLocaleString()}`, inline: true },
-                { name: '🗺️ Territories', value: `${crew.territories.length}`, inline: true }
+                { name: '👑 Captain', value: safeMembers.find(m => m.role === 'captain')?.username || 'Unknown', inline: true },
+                { name: '👥 Members', value: `${safeCrew.members.length}`, inline: true },
+                { name: '⭐ Level', value: `${safeCrew.level}`, inline: true },
+                { name: '🏆 Reputation', value: `${safeCrew.reputation}`, inline: true },
+                { name: '💰 Bounty', value: `₿${safeCrew.bounty.toLocaleString()}`, inline: true },
+                { name: '🗺️ Territories', value: `${safeCrew.territories.length}`, inline: true }
             );
 
-        if (members.length > 0) {
-            const memberList = members.map(member => {
+        if (safeMembers.length > 0) {
+            const memberList = safeMembers.map(member => {
                 const roleEmoji = member.role === 'captain' ? '👑' : '⚓';
                 return `${roleEmoji} ${member.username} (Lv.${member.level})`;
             }).slice(0, 10).join('\n');
@@ -170,7 +218,7 @@ class CustomEmbedBuilder {
             embed.addFields({ name: '👥 Crew Roster', value: memberList || 'No members' });
         }
 
-        embed.setFooter({ text: `Founded ${new Date(crew.createdAt).toDateString()}` });
+        embed.setFooter({ text: `Founded ${new Date(safeCrew.createdAt).toDateString()}` });
         return embed;
     }
 
@@ -211,19 +259,25 @@ class CustomEmbedBuilder {
 
     // Inventory display embed
     static inventory(userData, items) {
+        // Ensure userData has default values to prevent NaN/undefined errors
+        const safeUserData = {
+            berries: userData.berries || 0
+        };
+        const safeItems = items || [];
+        
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.PRIMARY)
             .setTitle('📦 Your Inventory')
-            .setDescription(`You have ${items.length} items in your inventory.`)
-            .addFields({ name: '💰 Berries', value: `₿${userData.berries.toLocaleString()}`, inline: true });
+            .setDescription(`You have ${safeItems.length} items in your inventory.`)
+            .addFields({ name: '💰 Berries', value: `₿${safeUserData.berries.toLocaleString()}`, inline: true });
 
-        if (items.length === 0) {
+        if (safeItems.length === 0) {
             embed.setDescription('Your inventory is empty! Visit the shop to buy items.');
             return embed;
         }
 
         // Group items by type
-        const groupedItems = items.reduce((groups, item) => {
+        const groupedItems = safeItems.reduce((groups, item) => {
             const type = item.type || 'misc';
             if (!groups[type]) groups[type] = [];
             groups[type].push(item);
@@ -309,7 +363,9 @@ class CustomEmbedBuilder {
 
     // Format berries with proper thousands separators
     static formatBerries(amount) {
-        return `₿${amount.toLocaleString()}`;
+        // Ensure amount has a default value to prevent NaN/undefined errors
+        const safeAmount = amount || 0;
+        return `₿${safeAmount.toLocaleString()}`;
     }
 
     // Format large numbers with abbreviations

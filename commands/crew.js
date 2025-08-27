@@ -71,7 +71,7 @@ module.exports = {
         
     async execute(interaction) {
         const userId = interaction.user.id;
-        const userData = database.getUser(userId);
+        const userData = await database.getUser(userId);
         
         if (!userData) {
             const embed = new EmbedBuilder()
@@ -188,16 +188,17 @@ async function handleInfo(interaction, userData) {
     }
     
     // Get crew member details
-    const members = targetCrew.members.map(memberId => {
-        const member = database.getUser(memberId);
+    const memberPromises = targetCrew.members.map(async memberId => {
+        const member = await database.getUser(memberId);
         if (member) {
             const roleEmoji = member.crewRole === 'captain' ? '👑' : '⚓';
             return `${roleEmoji} ${member.username} (Lv.${member.level})`;
         }
         return '❓ Unknown Member';
     });
+    const members = await Promise.all(memberPromises);
     
-    const captain = database.getUser(targetCrew.captain);
+            const captain = await database.getUser(targetCrew.captain);
     
     const embed = new EmbedBuilder()
         .setColor(config.COLORS.PRIMARY)
@@ -226,7 +227,7 @@ async function handleInfo(interaction, userData) {
 
 async function handleInvite(interaction, userData) {
     const targetUser = interaction.options.getUser('user');
-    const targetUserData = database.getUser(targetUser.id);
+    const targetUserData = await database.getUser(targetUser.id);
     
     // Check if invoker is in a crew and is captain
     if (!userData.crewId) {
@@ -342,7 +343,7 @@ async function handleJoin(interaction, userData) {
             .setDescription(`You've successfully joined the **${targetCrew.name}** crew!`)
             .addFields(
                 { name: '🏴‍☠️ Crew', value: targetCrew.name, inline: true },
-                { name: '👑 Captain', value: database.getUser(targetCrew.captain)?.username || 'Unknown', inline: true },
+                { name: '👑 Captain', value: (await database.getUser(targetCrew.captain))?.username || 'Unknown', inline: true },
                 { name: '👥 Members', value: `${targetCrew.members.length + 1}`, inline: true },
                 { name: '🎯 Your Role', value: 'Crew Member' }
             )
@@ -420,7 +421,7 @@ async function handleKick(interaction, userData) {
     
     if (kickResult.success) {
         // Update target user data
-        const targetUserData = database.getUser(targetUser.id);
+        const targetUserData = await database.getUser(targetUser.id);
         if (targetUserData) {
             targetUserData.crewId = null;
             targetUserData.crewRole = 'member';
@@ -469,17 +470,20 @@ async function handleList(interaction, userData) {
         .setTitle('🏴‍☠️ Active Pirate Crews')
         .setDescription(`There are **${allCrews.length}** active crews sailing the Grand Line!`);
     
-    sortedCrews.forEach((crew, index) => {
-        const captain = database.getUser(crew.captain);
+    const crewPromises = sortedCrews.map(async (crew, index) => {
+        const captain = await database.getUser(crew.captain);
         const ranking = index + 1;
         const rankingEmoji = ranking === 1 ? '🥇' : ranking === 2 ? '🥈' : ranking === 3 ? '🥉' : `${ranking}.`;
         
-        embed.addFields({
+        return {
             name: `${rankingEmoji} ${crew.name}`,
             value: `👑 **${captain?.username || 'Unknown'}**\n👥 ${crew.members.length} members\n🏆 ${crew.reputation} reputation`,
             inline: true
-        });
+        };
     });
+    
+    const crewFields = await Promise.all(crewPromises);
+    crewFields.forEach(field => embed.addFields(field));
     
     embed.setFooter({ text: 'Use /crew info <name> to view detailed crew information!' });
     

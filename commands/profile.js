@@ -16,7 +16,7 @@ module.exports = {
         const targetUser = interaction.options.getUser('user') || interaction.user;
         const userId = targetUser.id;
         
-        const userData = database.getUser(userId);
+        const userData = await database.getUser(userId);
         if (!userData) {
             const embed = new EmbedBuilder()
                 .setColor(config.COLORS.ERROR)

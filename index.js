@@ -105,7 +105,7 @@ client.on('interactionCreate', async interaction => {
                 const customIdParts = interaction.customId.split('_');
                 const action = customIdParts[1]; // attack, defend, special, flee, fight
                 const userId = interaction.user.id;
-                const userData = database.getUser(userId);
+                const userData = await database.getUser(userId);
                 
                 if (!userData) {
                     return interaction.reply({
@@ -302,7 +302,7 @@ client.on('interactionCreate', async interaction => {
             try {
                 const page = parseInt(interaction.customId.split('_')[2]);
                 const userId = interaction.user.id;
-                const userData = database.getUser(userId);
+                const userData = await database.getUser(userId);
                 
                 if (!userData) {
                     return interaction.reply({

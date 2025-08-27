@@ -121,7 +121,7 @@ class CrewSystem {
                 crew.captain = newCaptain;
                 
                 // Update new captain's role
-                const newCaptainData = database.getUser(newCaptain);
+                const newCaptainData = await database.getUser(newCaptain);
                 if (newCaptainData) {
                     newCaptainData.crewRole = 'captain';
                     database.updateUser(newCaptain, newCaptainData);
@@ -275,12 +275,12 @@ class CrewSystem {
         };
     }
 
-    getCrewMemberStats(crewId) {
+    async getCrewMemberStats(crewId) {
         const crew = database.getCrew(crewId);
         if (!crew) return null;
 
-        const memberStats = crew.members.map(memberId => {
-            const member = database.getUser(memberId);
+        const memberPromises = crew.members.map(async memberId => {
+            const member = await database.getUser(memberId);
             return {
                 id: memberId,
                 username: member?.username || 'Unknown',
@@ -290,6 +290,8 @@ class CrewSystem {
                          (Date.now() - new Date(member.lastActive).getTime()) < 300000 // 5 minutes
             };
         });
+
+        const memberStats = await Promise.all(memberPromises);
 
         return {
             crew: crew,

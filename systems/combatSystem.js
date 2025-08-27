@@ -27,7 +27,7 @@ class CombatSystem {
 
     // Start a new combat session
     async startCombat(userId, enemy) {
-        const user = database.getUser(userId);
+        const user = await database.getUser(userId);
         if (!user) return null;
 
         const combatSession = {

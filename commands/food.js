@@ -31,7 +31,7 @@ module.exports = {
 
     async execute(interaction) {
         const userId = interaction.user.id;
-        const userData = database.getUser(userId);
+        const userData = await database.getUser(userId);
         
         if (!userData) {
             const embed = new EmbedBuilder()
@@ -59,7 +59,7 @@ module.exports = {
     async autocomplete(interaction) {
         const focusedValue = interaction.options.getFocused();
         const userId = interaction.user.id;
-        const userData = database.getUser(userId);
+        const userData = await database.getUser(userId);
         
         if (!userData || !userData.inventory) {
             await interaction.respond([]);
