@@ -41,7 +41,7 @@ module.exports = {
                 .setDescription('You are not currently in combat.')
                 .addFields(
                     { name: '🏆 Combat Record', value: `**${userData.wins}** Wins - **${userData.losses}** Losses`, inline: true },
-                    { name: '👹 Enemies Defeated', value: `${userData.enemiesDefeated}`, inline: true },
+                    { name: '👹 Enemies Defeated', value: `${userData.enemies_defeated || 0}`, inline: true },
                     { name: '🎯 Next Action', value: 'Use `/explore` to find enemies to battle!' }
                 );
                 

@@ -103,8 +103,8 @@ class EconomySystem {
         // Apply stat bonuses
         userData.attack += item.stats.attack || 0;
         userData.defense += item.stats.defense || 0;
-        userData.maxHealth += item.stats.health || 0;
-        userData.health = Math.min(userData.health + (item.stats.health || 0), userData.maxHealth);
+        userData.max_health += item.stats.health || 0;
+        userData.health = Math.min(userData.health + (item.stats.health || 0), userData.max_health);
 
         return { success: true, userData: userData };
     }
@@ -116,8 +116,8 @@ class EconomySystem {
         // Remove stat bonuses
         userData.attack -= item.stats.attack || 0;
         userData.defense -= item.stats.defense || 0;
-        userData.maxHealth -= item.stats.health || 0;
-        userData.health = Math.min(userData.health, userData.maxHealth);
+        userData.max_health -= item.stats.health || 0;
+        userData.health = Math.min(userData.health, userData.max_health);
 
         // Remove from equipment
         userData.equipment[slot] = null;
@@ -135,7 +135,7 @@ class EconomySystem {
         let healAmount = 0;
 
         if (effects.heal) {
-            healAmount = Math.min(effects.heal, userData.maxHealth - userData.health);
+            healAmount = Math.min(effects.heal, userData.max_health - userData.health);
             userData.health += healAmount;
         }
 

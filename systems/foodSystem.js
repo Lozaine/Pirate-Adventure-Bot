@@ -63,7 +63,7 @@ class FoodSystem {
 
         // Apply immediate healing
         if (effects.heal) {
-            healAmount = Math.min(effects.heal, userData.maxHealth - userData.health);
+            healAmount = Math.min(effects.heal, userData.max_health - userData.health);
             userData.health += healAmount;
             if (healAmount > 0) results.push(`Restored ${healAmount} health`);
         }
@@ -80,8 +80,8 @@ class FoodSystem {
             };
 
             // Remove existing buff of same type
-            userData.activeFoodBuffs = userData.activeFoodBuffs.filter(b => b.id !== foodItem.id);
-            userData.activeFoodBuffs.push(buff);
+            userData.active_food_buffs = userData.active_food_buffs.filter(b => b.id !== foodItem.id);
+            userData.active_food_buffs.push(buff);
 
             if (effects.attack) results.push(`+${effects.attack} Attack (${Math.floor(foodItem.duration / 60000)} min)`);
             if (effects.defense) results.push(`+${effects.defense} Defense (${Math.floor(foodItem.duration / 60000)} min)`);
@@ -107,20 +107,20 @@ class FoodSystem {
 
     getActiveFoodBuffs(userData) {
         this.cleanupExpiredBuffs(userData);
-        return userData.activeFoodBuffs || [];
+        return userData.active_food_buffs || [];
     }
 
     cleanupExpiredBuffs(userData) {
-        if (!userData.activeFoodBuffs) {
-            userData.activeFoodBuffs = [];
+        if (!userData.active_food_buffs) {
+            userData.active_food_buffs = [];
             return;
         }
 
         const now = Date.now();
-        const originalLength = userData.activeFoodBuffs.length;
-        userData.activeFoodBuffs = userData.activeFoodBuffs.filter(buff => buff.expiresAt > now);
+        const originalLength = userData.active_food_buffs.length;
+        userData.active_food_buffs = userData.active_food_buffs.filter(buff => buff.expiresAt > now);
         
-        return userData.activeFoodBuffs.length < originalLength; // Return true if any buffs were removed
+        return userData.active_food_buffs.length < originalLength; // Return true if any buffs were removed
     }
 
     calculateFoodBonuses(userData) {

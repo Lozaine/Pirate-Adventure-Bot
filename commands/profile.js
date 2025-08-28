@@ -49,8 +49,8 @@ module.exports = {
         
         // Devil Fruit information
         let devilFruitInfo = 'None';
-        if (userData.devils_fruit) {
-            devilFruitInfo = `${userData.devils_fruit.emoji} ${userData.devils_fruit.name}\n*Power Level: ${userData.devil_fruit_power || 0}*`;
+        if (userData.devil_fruit) {
+            devilFruitInfo = `${userData.devil_fruit.emoji} ${userData.devil_fruit.name}\n*Power Level: ${userData.devil_fruit_power || 0}*`;
         }
         
         // Ensure berries field exists and has a valid value

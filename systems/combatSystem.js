@@ -21,7 +21,7 @@ class CombatSystem {
             attack: userData.attack + foodBonuses.attack,
             defense: userData.defense + foodBonuses.defense,
             health: userData.health,
-            maxHealth: userData.maxHealth
+            maxHealth: userData.max_health
         };
     }
 
@@ -34,7 +34,7 @@ class CombatSystem {
             userId: userId,
             enemy: enemy,
             userHealth: user.health,
-            userMaxHealth: user.maxHealth,
+            userMaxHealth: user.max_health,
             enemyHealth: enemy.health,
             enemyMaxHealth: enemy.health,
             turn: 'user',
@@ -54,7 +54,7 @@ class CombatSystem {
                     userId: userId,
                     enemy: enemy,
                     userHealth: user.health,
-                    userMaxHealth: user.maxHealth,
+                    userMaxHealth: user.max_health,
                     enemyHealth: enemy.health,
                     enemyMaxHealth: enemy.health,
                     turn: 'user',
@@ -317,7 +317,7 @@ class CombatSystem {
             userData.berries += berryReward;
             userData.experience += expReward;
             userData.wins += 1;
-            userData.enemiesDefeated += 1;
+            userData.enemies_defeated = (userData.enemies_defeated || 0) + 1;
             userData.health = combat.userHealth; // Update health from combat
 
             endResult.rewards = {
@@ -333,11 +333,11 @@ class CombatSystem {
 
         } else if (result === 'defeat') {
             userData.losses += 1;
-            userData.health = Math.max(1, Math.floor(userData.maxHealth * 0.1)); // Leave with 10% health
+            userData.health = Math.max(1, Math.floor(userData.max_health * 0.1)); // Leave with 10% health
             userData.berries = Math.max(0, userData.berries - Math.floor(userData.berries * 0.1)); // Lose 10% berries
 
             endResult.penalties = {
-                healthLoss: userData.maxHealth - userData.health,
+                healthLoss: userData.max_health - userData.health,
                 berryLoss: Math.floor(userData.berries * 0.1)
             };
         } else if (result === 'fled') {
@@ -359,8 +359,8 @@ class CombatSystem {
         const attackGain = config.ATTACK_PER_LEVEL;
         const defenseGain = config.DEFENSE_PER_LEVEL;
 
-        userData.maxHealth += healthGain;
-        userData.health = userData.maxHealth; // Full heal on level up
+        userData.max_health += healthGain;
+        userData.health = userData.max_health; // Full heal on level up
         userData.attack += attackGain;
         userData.defense += defenseGain;
         userData.experience = 0; // Reset for next level

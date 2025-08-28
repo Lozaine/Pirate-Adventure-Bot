@@ -129,8 +129,8 @@ class ExplorationSystem {
             const attackGain = config.ATTACK_PER_LEVEL;
             const defenseGain = config.DEFENSE_PER_LEVEL;
 
-            userData.maxHealth += healthGain;
-            userData.health = userData.maxHealth; // Full heal on level up
+            userData.max_health += healthGain;
+            userData.health = userData.max_health; // Full heal on level up
             userData.attack += attackGain;
             userData.defense += defenseGain;
             userData.experience = 0; // Reset for next level

@@ -68,15 +68,15 @@ async function handleSearch(interaction, userData) {
     }
     
     // Check if user already has a Devil Fruit
-    if (userData.devilFruit) {
+    if (userData.devil_fruit) {
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.WARNING)
             .setTitle('🍎 Already Have Power')
-            .setDescription(`You already possess the **${userData.devilFruit.name}**! You cannot eat another Devil Fruit.`)
+            .setDescription(`You already possess the **${userData.devil_fruit.name}**! You cannot eat another Devil Fruit.`)
             .addFields(
-                { name: '🍎 Current Fruit', value: `${userData.devilFruit.emoji} ${userData.devilFruit.name}` },
-                { name: '⚡ Power Level', value: `${userData.devilFruitPower}/100` },
-                { name: '💫 Type', value: userData.devilFruit.type }
+                { name: '🍎 Current Fruit', value: `${userData.devil_fruit.emoji} ${userData.devil_fruit.name}` },
+                { name: '⚡ Power Level', value: `${userData.devil_fruit_power}/100` },
+                { name: '💫 Type', value: userData.devil_fruit.type }
             );
         return await interaction.reply({ embeds: [embed] });
     }
@@ -91,15 +91,15 @@ async function handleSearch(interaction, userData) {
         const devilFruit = devilFruitSystem.getRandomDevilFruit();
         
         // Give Devil Fruit to user
-        userData.devilFruit = devilFruit;
-        userData.devilFruitPower = 1;
+        userData.devil_fruit = devilFruit;
+        userData.devil_fruit_power = 1;
         
         // Apply initial stat bonuses
         const statBonus = devilFruitSystem.calculateStatBonus(devilFruit, 1);
         userData.attack += statBonus.attack;
         userData.defense += statBonus.defense;
-        userData.maxHealth += statBonus.health;
-        userData.health = userData.maxHealth; // Restore health when gaining fruit
+        userData.max_health += statBonus.health;
+        userData.health = userData.max_health; // Restore health when gaining fruit
         
         database.updateUser(userId, userData);
         
@@ -141,7 +141,7 @@ async function handleSearch(interaction, userData) {
 }
 
 async function handleInfo(interaction, userData) {
-    if (!userData.devilFruit) {
+    if (!userData.devil_fruit) {
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.WARNING)
             .setTitle('🍎 No Devil Fruit')
@@ -149,8 +149,8 @@ async function handleInfo(interaction, userData) {
         return await interaction.reply({ embeds: [embed] });
     }
     
-    const devilFruit = userData.devilFruit;
-    const powerLevel = userData.devilFruitPower;
+    const devilFruit = userData.devil_fruit;
+    const powerLevel = userData.devil_fruit_power;
     const statBonus = devilFruitSystem.calculateStatBonus(devilFruit, powerLevel);
     const nextLevelBonus = devilFruitSystem.calculateStatBonus(devilFruit, Math.min(100, powerLevel + 1));
     
@@ -179,7 +179,7 @@ async function handleInfo(interaction, userData) {
 }
 
 async function handleTrain(interaction, userData) {
-    if (!userData.devilFruit) {
+    if (!userData.devil_fruit) {
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.WARNING)
             .setTitle('🍎 No Devil Fruit')
@@ -188,11 +188,11 @@ async function handleTrain(interaction, userData) {
     }
     
     // Ensure userData properties have default values to prevent NaN/undefined errors
-    const devilFruitPower = userData.devilFruitPower || 0;
+    const devilFruitPower = userData.devil_fruit_power || 0;
     const berries = userData.berries || 0;
     const attack = userData.attack || 0;
     const defense = userData.defense || 0;
-    const maxHealth = userData.maxHealth || 100;
+    const maxHealth = userData.max_health || 100;
     const health = userData.health || 100;
     
     if (devilFruitPower >= 100) {
@@ -218,20 +218,20 @@ async function handleTrain(interaction, userData) {
     
     if (trainingResult.success) {
         userData.berries = berries - trainingCost;
-        userData.devilFruitPower = trainingResult.newPowerLevel;
+        userData.devil_fruit_power = trainingResult.newPowerLevel;
         
         // Apply stat increases
         userData.attack = attack + trainingResult.statGains.attack;
         userData.defense = defense + trainingResult.statGains.defense;
-        userData.maxHealth = maxHealth + trainingResult.statGains.health;
-        userData.health = Math.min(health + trainingResult.statGains.health, userData.maxHealth);
+        userData.max_health = maxHealth + trainingResult.statGains.health;
+        userData.health = Math.min(health + trainingResult.statGains.health, userData.max_health);
         
         database.updateUser(interaction.user.id, userData);
         
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.SUCCESS)
             .setTitle('⚡ Training Successful!')
-            .setDescription(`Your ${userData.devilFruit.name} power has grown stronger!`)
+            .setDescription(`Your ${userData.devil_fruit.name} power has grown stronger!`)
             .addFields(
                 { name: '📈 Power Level', value: `${trainingResult.previousLevel} → ${trainingResult.newPowerLevel}`, inline: true },
                 { name: '💰 Cost', value: `₿${trainingCost.toLocaleString()}`, inline: true },

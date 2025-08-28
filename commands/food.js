@@ -157,7 +157,7 @@ async function handleEatFood(interaction, userData) {
     let results = [];
     
     if (effects.heal) {
-        healAmount = Math.min(effects.heal, userData.maxHealth - userData.health);
+        healAmount = Math.min(effects.heal, userData.max_health - userData.health);
         userData.health += healAmount;
         if (healAmount > 0) results.push(`Restored ${healAmount} health`);
     }
@@ -174,8 +174,8 @@ async function handleEatFood(interaction, userData) {
         };
         
         // Remove existing buff of same type
-        userData.activeFoodBuffs = userData.activeFoodBuffs.filter(b => b.id !== foodItem.id);
-        userData.activeFoodBuffs.push(buff);
+        userData.active_food_buffs = userData.active_food_buffs.filter(b => b.id !== foodItem.id);
+        userData.active_food_buffs.push(buff);
         
         if (effects.attack) results.push(`+${effects.attack} Attack (${Math.floor(foodItem.duration / 60000)} min)`);
         if (effects.defense) results.push(`+${effects.defense} Defense (${Math.floor(foodItem.duration / 60000)} min)`);
@@ -210,7 +210,7 @@ async function handleEatFood(interaction, userData) {
     if (healAmount > 0) {
         embed.addFields({
             name: '❤️ Health',
-            value: `${userData.health}/${userData.maxHealth} HP`,
+            value: `${userData.health}/${userData.max_health} HP`,
             inline: true
         });
     }
@@ -222,7 +222,7 @@ async function handleFoodBuffs(interaction, userData) {
     // Clean up expired buffs
     cleanupExpiredBuffs(userData);
     
-    if (!userData.activeFoodBuffs || userData.activeFoodBuffs.length === 0) {
+    if (!userData.active_food_buffs || userData.active_food_buffs.length === 0) {
         const embed = new EmbedBuilder()
             .setColor(config.COLORS.WARNING)
             .setTitle('🍽️ No Active Food Buffs')
@@ -243,7 +243,7 @@ async function handleFoodBuffs(interaction, userData) {
     let totalAttack = 0;
     let totalDefense = 0;
     
-    userData.activeFoodBuffs.forEach(buff => {
+    userData.active_food_buffs.forEach(buff => {
         const timeLeft = Math.max(0, buff.expiresAt - Date.now());
         const minutesLeft = Math.floor(timeLeft / 60000);
         const secondsLeft = Math.floor((timeLeft % 60000) / 1000);
@@ -282,11 +282,11 @@ async function handleFoodBuffs(interaction, userData) {
 }
 
 function cleanupExpiredBuffs(userData) {
-    if (!userData.activeFoodBuffs) {
-        userData.activeFoodBuffs = [];
+    if (!userData.active_food_buffs) {
+        userData.active_food_buffs = [];
         return;
     }
     
     const now = Date.now();
-    userData.activeFoodBuffs = userData.activeFoodBuffs.filter(buff => buff.expiresAt > now);
+    userData.active_food_buffs = userData.active_food_buffs.filter(buff => buff.expiresAt > now);
 }
