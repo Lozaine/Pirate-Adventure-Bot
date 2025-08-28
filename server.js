@@ -1,52 +1,31 @@
-const express = require('express');
-const path = require('path');
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { startBot } from './src/bot.js';
+
+// ES Module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Serve static files (CSS, JS, images)
+// Serve static files (CSS, JS, images) from the root directory
 app.use(express.static(path.join(__dirname)));
 
-// Favicon support
-app.get('/favicon.ico', (req, res) => {
-    res.type('image/png');
-    res.sendFile(path.join(__dirname, 'favicon.png'));
-});
-
-// Serve the main HTML file for all routes
+// Serve the main HTML file for the root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Handle specific routes that might be accessed directly
-app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/commands', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/guides', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/changelog', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/terms', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('/privacy', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Start the server
+// Start the Express server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`[INFO] Website server running on port ${PORT}`);
-    console.log(`[INFO] Server accessible at http://localhost:${PORT}`);
+    console.log(`[INFO] Access the website at http://localhost:${PORT}`);
+
+    // Start the Discord bot
+    console.log('[INFO] Starting Discord bot...');
+    startBot();
 });
 
-module.exports = app;
+export default app;
