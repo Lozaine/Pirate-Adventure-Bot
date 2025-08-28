@@ -50,10 +50,10 @@ export async function loadCommands(client) {
  * @param {import('discord.js').Client} client The Discord client instance containing the loaded commands.
  */
 export async function registerCommands(client) {
-  const { DISCORD_TOKEN, CLIENT_ID, GUILD_ID } = process.env;
+  const { DISCORD_TOKEN, CLIENT_ID } = process.env;
 
-  if (!DISCORD_TOKEN || !CLIENT_ID || !GUILD_ID) {
-    console.error('[ERROR] Cannot register commands. Missing required environment variables: DISCORD_TOKEN, CLIENT_ID, GUILD_ID.');
+  if (!DISCORD_TOKEN || !CLIENT_ID) {
+    console.error('[ERROR] Cannot register commands. Missing required environment variables: DISCORD_TOKEN, CLIENT_ID.');
     return;
   }
 
@@ -66,16 +66,17 @@ export async function registerCommands(client) {
   }
 
   try {
-    console.log(`[INFO] Started refreshing ${commandsData.length} application (/) commands for guild: ${GUILD_ID}`);
+    console.log(`[INFO] Started refreshing ${commandsData.length} global application (/) commands.`);
 
-    // The put method is used to fully refresh all commands in the guild with the current set.
+    // The put method is used to fully refresh all global commands with the current set.
+    // Global commands can take up to an hour to propagate to all servers.
     await rest.put(
-      Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID),
+      Routes.applicationCommands(CLIENT_ID),
       { body: commandsData },
     );
 
-    console.log(`[INFO] Successfully reloaded ${commandsData.length} application (/) commands.`);
+    console.log(`[INFO] Successfully reloaded ${commandsData.length} global application (/) commands.`);
   } catch (error) {
-    console.error('[ERROR] Failed to register application commands:', error);
+    console.error('[ERROR] Failed to register global application commands:', error);
   }
 }

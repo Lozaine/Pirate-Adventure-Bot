@@ -28,7 +28,7 @@ export async function startBot() {
 
   // Event handler for when the client is ready
   // This runs once after the bot successfully logs in
-  client.once('ready', async () => {
+  client.once('clientReady', async () => {
     console.log(`[INFO] Bot is ready! Logged in as ${client.user.tag}`);
     // Register the loaded commands with Discord's API
     await registerCommands(client);
