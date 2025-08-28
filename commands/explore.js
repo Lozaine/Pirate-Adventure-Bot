@@ -160,7 +160,7 @@ module.exports = {
         }
         
         // Update last explore time
-        userData.lastExplore = new Date().toISOString();
+        userData.last_explore = new Date().toISOString();
         userData.currentLocation = explorationResult.location;
         database.updateUser(userId, userData);
         

@@ -4,6 +4,29 @@ const config = require('../config.js');
 const cooldowns = require('../utils/cooldowns.js');
 const randomizer = require('../utils/randomizer.js');
 
+// Simple level up function
+function levelUp(userData) {
+    const oldLevel = userData.level;
+    userData.level = oldLevel + 1;
+    
+    const healthGain = Math.floor(20 + (userData.level * 2));
+    const attackGain = Math.floor(3 + (userData.level * 0.5));
+    const defenseGain = Math.floor(2 + (userData.level * 0.3));
+    
+    userData.max_health += healthGain;
+    userData.health = userData.max_health; // Full heal on level up
+    userData.attack += attackGain;
+    userData.defense += defenseGain;
+    
+    return {
+        newLevel: userData.level,
+        healthGain,
+        attackGain,
+        defenseGain,
+        userData
+    };
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('treasure')
@@ -55,18 +78,18 @@ module.exports = {
             embed = new EmbedBuilder()
                 .setColor(config.COLORS.TREASURE)
                 .setTitle('💎 Treasure Found!')
-                .setDescription(`You discovered **${treasureResult.treasure.name}** in **${userData.currentLocation}**!`)
+                .setDescription(`You discovered **${treasureResult.treasure?.name || 'a mysterious treasure'}** in **${userData.currentLocation || 'Unknown Location'}**!`)
                 .addFields(
-                    { name: '💰 Berries', value: `+₿${treasureResult.berries.toLocaleString()}`, inline: true },
-                    { name: '⭐ Experience', value: `+${treasureResult.experience} EXP`, inline: true },
-                    { name: '🗺️ Location', value: userData.currentLocation, inline: true },
-                    { name: '📜 Description', value: treasureResult.treasure.description }
+                    { name: '💰 Berries', value: `+₿${treasureResult.berries?.toLocaleString() || 0}`, inline: true },
+                    { name: '⭐ Experience', value: `+${treasureResult.experience || 0} EXP`, inline: true },
+                    { name: '🗺️ Location', value: userData.currentLocation || 'Unknown', inline: true },
+                    { name: '📜 Description', value: treasureResult.treasure?.description || 'A mysterious treasure' }
                 );
                 
             if (treasureResult.item) {
                 embed.addFields({
                     name: '🎁 Special Item',
-                    value: `You found **${treasureResult.item.name}**!\n*${treasureResult.item.description}*`
+                    value: `You found **${treasureResult.item.name || 'Unknown Item'}**!\n*${treasureResult.item.description || 'A special item'}*`
                 });
             }
             
@@ -88,16 +111,16 @@ module.exports = {
             embed = new EmbedBuilder()
                 .setColor(config.COLORS.PRIMARY)
                 .setTitle('🔍 Treasure Hunt')
-                .setDescription(treasureResult.message)
+                .setDescription(treasureResult.message || 'No treasure was found this time.')
                 .addFields(
-                    { name: '🗺️ Location Searched', value: userData.currentLocation, inline: true },
+                    { name: '🗺️ Location Searched', value: userData.currentLocation || 'Unknown', inline: true },
                     { name: '🎁 Consolation', value: `+${consolationExp} EXP`, inline: true },
                     { name: '💡 Tip', value: 'Try exploring different locations or come back later!' }
                 );
         }
         
         // Update user data
-        userData.lastTreasure = new Date().toISOString();
+        userData.last_treasure = new Date().toISOString();
         database.updateUser(userId, userData);
         
         await interaction.reply({ embeds: [embed] });

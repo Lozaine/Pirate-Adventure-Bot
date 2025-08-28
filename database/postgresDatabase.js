@@ -62,11 +62,17 @@ class PostgresDatabase {
             const values = [];
             let paramCount = 1;
 
+            const processedKeys = new Set(); // Track processed keys to prevent duplicates
+            
             for (const [key, value] of Object.entries(updates)) {
                 if (key === 'id' || key === 'discord_id') continue; // Skip protected fields
                 
                 // Convert camelCase to snake_case
                 const dbKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+                
+                // Skip if we've already processed this database key
+                if (processedKeys.has(dbKey)) continue;
+                processedKeys.add(dbKey);
                 
                 setClause.push(`${dbKey} = $${paramCount}`);
                 values.push(value);
@@ -76,8 +82,13 @@ class PostgresDatabase {
             if (setClause.length === 0) return null;
 
             values.push(discordId);
+            
+            // Check if last_active is already being set to avoid duplication
+            const hasLastActive = setClause.some(clause => clause.includes('last_active'));
+            const finalSetClause = hasLastActive ? setClause.join(', ') : setClause.join(', ') + ', last_active = NOW()';
+            
             const result = await this.pool.query(`
-                UPDATE users SET ${setClause.join(', ')}, last_active = NOW()
+                UPDATE users SET ${finalSetClause}
                 WHERE discord_id = $${paramCount}
                 RETURNING *
             `, values);

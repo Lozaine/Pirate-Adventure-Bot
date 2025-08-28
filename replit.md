@@ -24,6 +24,10 @@ This is a One Piece themed Discord bot with RPG elements, built with Node.js, Di
 - **2024-12-28**: Starting migration from Replit Agent to standard Replit
 - **Issue**: Missing `pg` module causing Discord Bot Server to fail
 - **Solution**: Installing proper Node.js dependencies via packager tool
+- **Fixed**: Database field naming inconsistencies (devil_fruit, active_food_buffs)
+- **Fixed**: Database duplicate column assignment error in updateUser method
+- **Fixed**: Treasure command Discord.js embed validation errors
+- **Status**: All systems operational, bot fully functional with all 11 commands
 
 ## Dependencies
 - discord.js: Discord API wrapper
