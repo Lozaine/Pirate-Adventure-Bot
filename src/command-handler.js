@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v10';
 
@@ -26,7 +26,7 @@ export async function loadCommands(client) {
 
   for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
-    const fileUrl = path.toFileUrl(filePath).href; // Convert path to a file URL for dynamic import
+    const fileUrl = pathToFileURL(filePath).href; // Convert path to a file URL for dynamic import
 
     try {
       // Use a cache-busting query param for potential hot-reloading in the future
