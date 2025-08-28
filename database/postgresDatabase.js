@@ -64,6 +64,12 @@ class PostgresDatabase {
 
             const processedKeys = new Set(); // Track processed keys to prevent duplicates
             
+            // Define fields that should be stored as JSON
+            const jsonFields = new Set([
+                'inventory', 'equipment', 'locations_visited', 'allies', 
+                'active_food_buffs', 'treasures_found'
+            ]);
+            
             for (const [key, value] of Object.entries(updates)) {
                 if (key === 'id' || key === 'discord_id') continue; // Skip protected fields
                 
@@ -75,7 +81,14 @@ class PostgresDatabase {
                 processedKeys.add(dbKey);
                 
                 setClause.push(`${dbKey} = $${paramCount}`);
-                values.push(value);
+                
+                // Handle JSON fields - stringify if they're objects/arrays
+                let processedValue = value;
+                if (jsonFields.has(dbKey) && (typeof value === 'object' && value !== null)) {
+                    processedValue = JSON.stringify(value);
+                }
+                
+                values.push(processedValue);
                 paramCount++;
             }
 
@@ -138,6 +151,11 @@ class PostgresDatabase {
             const values = [];
             let paramCount = 1;
 
+            // Define fields that should be stored as JSON for crews
+            const jsonFields = new Set([
+                'members', 'ships', 'territories', 'locations_discovered'
+            ]);
+
             for (const [key, value] of Object.entries(updates)) {
                 if (key === 'id') continue; // Skip protected fields
                 
@@ -145,7 +163,14 @@ class PostgresDatabase {
                 const dbKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
                 
                 setClause.push(`${dbKey} = $${paramCount}`);
-                values.push(value);
+                
+                // Handle JSON fields - stringify if they're objects/arrays
+                let processedValue = value;
+                if (jsonFields.has(dbKey) && (typeof value === 'object' && value !== null)) {
+                    processedValue = JSON.stringify(value);
+                }
+                
+                values.push(processedValue);
                 paramCount++;
             }
 
@@ -189,6 +214,9 @@ class PostgresDatabase {
             const values = [];
             let paramCount = 1;
 
+            // Define fields that should be stored as JSON for combat sessions
+            const jsonFields = new Set(['enemy', 'moves']);
+
             for (const [key, value] of Object.entries(updates)) {
                 if (key === 'id') continue; // Skip protected fields
                 
@@ -196,7 +224,14 @@ class PostgresDatabase {
                 const dbKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
                 
                 setClause.push(`${dbKey} = $${paramCount}`);
-                values.push(value);
+                
+                // Handle JSON fields - stringify if they're objects/arrays
+                let processedValue = value;
+                if (jsonFields.has(dbKey) && (typeof value === 'object' && value !== null)) {
+                    processedValue = JSON.stringify(value);
+                }
+                
+                values.push(processedValue);
                 paramCount++;
             }
 

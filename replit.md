@@ -27,7 +27,15 @@ This is a One Piece themed Discord bot with RPG elements, built with Node.js, Di
 - **Fixed**: Database field naming inconsistencies (devil_fruit, active_food_buffs)
 - **Fixed**: Database duplicate column assignment error in updateUser method
 - **Fixed**: Treasure command Discord.js embed validation errors
+- **Fixed**: JSON parsing errors in database operations - added proper JSON stringification for JSONB fields
 - **Status**: All systems operational, bot fully functional with all 11 commands
+
+- **2025-08-28**: Fixed critical JSON parsing errors in PostgreSQL operations
+- **Issue**: Invalid JSON syntax errors when updating user/crew/combat data
+- **Root Cause**: Objects and arrays were being passed directly to JSONB columns without proper stringification
+- **Solution**: Enhanced updateUser, updateCrew, and updateCombatSession methods to automatically stringify JSON fields
+- **Fields Fixed**: inventory, equipment, locations_visited, allies, active_food_buffs, members, ships, territories, enemy, moves
+- **Status**: Database operations now working correctly, no more JSON parsing errors
 
 ## Dependencies
 - discord.js: Discord API wrapper
