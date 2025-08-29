@@ -28,4 +28,4 @@ CREATE TABLE IF NOT EXISTS "users" (
 --> statement-breakpoint
 ALTER TABLE "characters" ADD CONSTRAINT "characters_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "stats" ADD CONSTRAINT "stats_character_id_characters_id_fk" FOREIGN KEY ("character_id") REFERENCES "public"."characters"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE UNIQUE INDEX "discord_id_idx" ON "users" USING btree ("discord_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "discord_id_idx" ON "users" USING btree ("discord_id");
