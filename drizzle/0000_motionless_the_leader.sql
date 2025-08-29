@@ -1,4 +1,4 @@
-CREATE TABLE "characters" (
+CREATE TABLE IF NOT EXISTS "characters" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"name" varchar(256) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE "characters" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "stats" (
+CREATE TABLE IF NOT EXISTS "stats" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"character_id" integer NOT NULL,
 	"strength" integer DEFAULT 0 NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE "stats" (
 	CONSTRAINT "stats_character_id_unique" UNIQUE("character_id")
 );
 --> statement-breakpoint
-CREATE TABLE "users" (
+CREATE TABLE IF NOT EXISTS "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"discord_id" varchar(256) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
