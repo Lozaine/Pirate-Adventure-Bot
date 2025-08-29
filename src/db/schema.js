@@ -69,3 +69,14 @@ export const statsRelations = relations(stats, ({ one }) => ({
     references: [characters.id],
   }),
 }));
+
+/**
+ * Stores bot settings and configuration
+ */
+export const settings = pgTable('settings', {
+  id: serial('id').primaryKey(),
+  key: varchar('key', { length: 256 }).notNull().unique(),
+  value: varchar('value', { length: 1024 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
